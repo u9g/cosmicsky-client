@@ -83,11 +83,16 @@ suspend fun makeWebsocket() {
 
                                     when (settingName) {
                                         "show_pings" -> {
-                                            val shouldShowPings = parsed["value"].asBoolean()
+                                            println(parsed["value"])
+                                            Settings.showPingsInGame = parsed["value"].asBoolean()
+                                        }
 
-                                            Settings.showPings = shouldShowPings
+                                        "pings_sent_to_chat" -> {
+                                            Settings.showPingsInChat = parsed["value"].asBoolean()
                                         }
                                     }
+
+                                    println("settings now= ingame:${Settings.showPingsInGame} chat:${Settings.showPingsInChat}")
                                 }
 
                                 else -> {
@@ -95,6 +100,11 @@ suspend fun makeWebsocket() {
                                 }
                             }
                         }
+                    }
+
+                    override fun onConnected(websocket: WebSocket?, headers: MutableMap<String, MutableList<String>>?) {
+                        println("skyplus > websocket connected")
+                        super.onConnected(websocket, headers)
                     }
 
                     override fun onDisconnected(

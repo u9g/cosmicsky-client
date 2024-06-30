@@ -29,6 +29,7 @@ class Waypoints {
 
         WorldRenderLastCallback.event.register { event ->
             if (pingsToRender.isEmpty()) return@register
+            if (!Settings.showPingsInGame) return@register
             RenderInWorldContext.renderInWorld(event) {
                 pingsToRender.forEach { ping ->
                     color(1f, 1f, 1f, 1f)
@@ -74,6 +75,7 @@ class Waypoints {
             val netHandler = client.networkHandler ?: return@register
             if (handler.connection.isLocal) return@register
             if (netHandler.world.isClient) {
+                println("skyplus > sent connected")
                 webSocket.sendText(
                     jsonObjectOf(
                         "type" to "connected",
