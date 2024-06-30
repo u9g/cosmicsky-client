@@ -3,99 +3,131 @@ package dev.u9g
 import com.eclipsesource.json.Json
 import com.neovisionaries.ws.client.WebSocket
 import com.neovisionaries.ws.client.WebSocketAdapter
+import com.neovisionaries.ws.client.WebSocketFrame
+import dev.u9g.events.CommandCallback
+import dev.u9g.events.CommandEvent
+import dev.u9g.features.*
+import dev.u9g.util.Coroutines
+import dev.u9g.util.MinecraftDispatcher
+import dev.u9g.util.coroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.fabricmc.api.ClientModInitializer
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.option.KeyBinding
-import net.minecraft.client.util.InputUtil
+import net.minecraft.client.sound.PositionedSoundInstance
+import net.minecraft.sound.SoundEvent
 import net.minecraft.text.Text
-import java.net.InetSocketAddress
+import net.minecraft.util.Identifier
+import net.minecraft.util.math.BlockPos
 
 lateinit var mc: MinecraftClient
 lateinit var webSocket: WebSocket
 var isOnline = false
 
-val pingKey = KeyBinding("Ping!", InputUtil.GLFW_KEY_F, "Pings")
-var pinging = false
+fun playSound(identifier: Identifier) {
+    mc.soundManager.play(PositionedSoundInstance.master(SoundEvent.of(identifier), 1F))
+}
 
-data class Ping(val x: Int, val y: Int, val z: Int, val time: Long)
+suspend fun makeWebsocket() {
+    withContext(MinecraftDispatcher) {
+        async(coroutineContext) {
+            webSocket = com.neovisionaries.ws.client.WebSocketFactory()
+                .createSocket("wss://cosmicsky-server-1.onrender.com")
+                .setPingInterval(10)
+                .addListener(object : WebSocketAdapter() {
+                    override fun onTextMessage(ws: WebSocket, message: String) {
+                        println("received message: $message")
+                        if (isOnline) {
+                            val parsed = Json.parse(message).asObject()
+                            val type = parsed["type"].asString()
+                            when (type) {
+                                "ping" -> {
+                                    val username = parsed["username"].asString()
+                                    val x = parsed["x"].asInt()
+                                    val y = parsed["y"].asInt()
+                                    val z = parsed["z"].asInt()
+                                    pingsToRender = pingsToRender.filterNot { it.username == username } + Ping(
+                                        BlockPos(x, y, z),
+                                        System.currentTimeMillis(),
+                                        username
+                                    )
 
-var pingsToRender = listOf<Ping>()
+                                    if (Settings.showPingsInChat) {
+                                        MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
+                                            Text.of(
+                                                "$username pinged at ($x,$y,$z)"
+                                            )
+                                        )
+                                    }
+                                }
 
-fun createWebsocket() {
-	webSocket = com.neovisionaries.ws.client.WebSocketFactory()
-		.createSocket("wss://cosmicsky-server.onrender.com")
-		.addListener(object : WebSocketAdapter() {
-			override fun onTextMessage(ws: WebSocket, message: String) {
-				try {
-					println("received message: $message")
-					if (isOnline) {
-						val parsed = Json.parse(message).asObject()
-						val username = parsed["username"].asString()
-						val x = parsed["x"].asInt()
-						val y = parsed["y"].asInt()
-						val z = parsed["z"].asInt()
-						pingsToRender = pingsToRender + Ping(x, y, z, System.currentTimeMillis())
-						MinecraftClient.getInstance().inGameHud.chatHud.addMessage(Text.of(
-							"$username pinged at ($x,$y,$z)"))
-					}
-				} catch (e: Exception) {}
-			}
-		})
-		.connect()
+                                "notification" -> {
+                                    if (parsed["minimessage"] != null) {
+                                        MinecraftClient.getInstance().player?.sendMessage(
+                                            MiniMessage.miniMessage().deserialize(parsed["minimessage"].asString())
+                                        )
+                                    } else if (parsed["message"] != null) {
+                                        MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
+                                            Text.of(
+                                                parsed["message"].asString()
+                                            )
+                                        )
+                                    }
+                                }
+
+                                "setting" -> {
+                                    val settingName = parsed["name"].asString()
+
+                                    when (settingName) {
+                                        "show_pings" -> {
+                                            val shouldShowPings = parsed["value"].asBoolean()
+
+                                            Settings.showPings = shouldShowPings
+                                        }
+                                    }
+                                }
+
+                                else -> {
+                                    println("Unexpected message type from websocket: $type")
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onDisconnected(
+                        websocket: WebSocket?,
+                        serverCloseFrame: WebSocketFrame?,
+                        clientCloseFrame: WebSocketFrame?,
+                        closedByServer: Boolean
+                    ) {
+                        super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
+                        webSocket = webSocket.recreate().connect()
+                    }
+                })
+                .connect()
+        }.await()
+    }
 }
 
 object SkyplusClient : ClientModInitializer {
-	override fun onInitializeClient() {
-		mc = MinecraftClient.getInstance()
-		createWebsocket()
-		KeyBindingHelper.registerKeyBinding(pingKey)
-		ClientPlayConnectionEvents.JOIN.register { handler, _, client ->
-			val netHandler = client.networkHandler ?: return@register
-			if (handler.connection.isLocal) return@register
-			if (netHandler.world.isClient) {
-				webSocket.sendText(jsonObjectOf(
-					"type" to "connected",
-					"username" to MinecraftClient.getInstance().session.username,
-					"host" to (handler.connection.address as InetSocketAddress).hostName
-				))
-				isOnline = true
-			}
-		}
-		ClientPlayConnectionEvents.DISCONNECT.register { handler, client ->
-			val netHandler = client.networkHandler ?: return@register
-			if (handler.connection.isLocal) return@register
-			if (netHandler.world.isClient) {
-				webSocket.sendText(jsonObjectOf("type" to "disconnected"))
-				isOnline = false
-			}
-		}
-		ClientTickEvents.END_CLIENT_TICK.register {
-			if (!pinging && pingKey.isPressed && isOnline) {
-				val block = MinecraftClient.getInstance().player!!.blockPos
-				webSocket.sendText(jsonObjectOf(
-					"type" to "ping",
-					"x" to block.x,
-					"y" to block.y,
-					"z" to block.z))
-				pinging = true
-			} else if (pinging && !pingKey.isPressed) {
-				pinging = false
-			}
+    override fun onInitializeClient() {
+        println("SkyPlus-Client starting.")
+        JavaMain.LOGGER.info("SkyPlus-Client starting. VIA LOGGER")
+        mc = MinecraftClient.getInstance()
+        coroutineScope.launch {
+            makeWebsocket()
+        }
+        Waypoints()
+        Calculator()
+        Coroutines()
+        Teams()
+        Settings.start()
 
-			pingsToRender = pingsToRender.filter { System.currentTimeMillis() - it.time < 60_000 }
-		}
-	}
+        ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
+            CommandCallback.event.invoker().invoke(CommandEvent(dispatcher, ctx, mc.networkHandler?.commandDispatcher))
+        }
+    }
 }
-
-fun jsonObjectOf(vararg pairs: Pair<String, *>) =
-	(mapOf(*pairs) to Json.`object`())
-		.also { (pairs, json) -> pairs.forEach { k ->
-			when (val value = k.value) {
-				is String -> json.add(k.key, value)
-				is Int -> json.add(k.key, value)
-				else -> throw RuntimeException("Unable to serialize $value")
-			}
-		}}.second.toString()

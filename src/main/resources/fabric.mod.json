@@ -1,48 +1,40 @@
 {
-	"schemaVersion": 1,
-	"id": "skyplus",
-	"version": "${version}",
-	"name": "skyplus",
-	"description": "This is an example description! Tell everyone what your mod is about!",
-	"authors": [
-		"Me!"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/skyplus/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			{
-				"value": "dev.u9g.Skyplus",
-				"adapter": "kotlin"
-			}
-		],
-		"client": [
-			{
-				"value": "dev.u9g.SkyplusClient",
-				"adapter": "kotlin"
-			}
-		]
-	},
-	"mixins": [
-		"skyplus.mixins.json",
-		{
-			"config": "skyplus.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.15.11",
-		"minecraft": "~1.20.4",
-		"java": ">=17",
-		"fabric-api": "*",
-		"fabric-language-kotlin": "1.11.0"
-	},
-	"suggests": {
-		"another-mod": "*"
-	}
+  "schemaVersion": 1,
+  "id": "skyplus",
+  "version": "${version}",
+  "name": "skyplus",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "authors": [
+    "Me!"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/skyplus/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "dev.u9g.JavaMain"
+    ]
+  },
+  "mixins": [
+    "skyplus.mixins.json",
+    {
+      "config": "skyplus.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "accessWidener": "skyplus.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.20.4",
+    "java": ">=17",
+    "fabric-api": "*",
+    "fabric-language-kotlin": "1.11.0"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
 }

@@ -1,11 +1,16 @@
 {
-	"required": true,
-	"package": "dev.u9g.mixin.client",
-	"compatibilityLevel": "JAVA_17",
-	"client": [
-		"ExampleClientMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "package": "dev.u9g.mixin.client",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "ExampleClientMixin",
+    "accessors.AccessorGameRenderer",
+    "events.WorldRenderLastEventPatch"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "VanillaResourcePackProviderMixin"
+  ]
 }
