@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.DeathScreen
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
 import net.minecraft.text.Text
@@ -25,6 +26,7 @@ var pingsToRender = listOf<Ping>()
 const val TIME_TO_WAIT_BEFORE_TARGETED_PING = 200
 
 var lastTickDelta: Float = 0.0F
+public var lastDeathPing = System.currentTimeMillis()
 
 class Waypoints {
     private val pingKey = KeyBinding("Ping!", InputUtil.GLFW_KEY_F, "Pings")
@@ -177,7 +179,7 @@ class Waypoints {
                         "type" to "connected",
                         "username" to MinecraftClient.getInstance().session.username,
                         "uuid" to MinecraftClient.getInstance().player!!.uuidAsString,
-                        "version" to "1.1.0"
+                        "version" to "1.1.1"
                     )
                 )
                 isOnline = true
@@ -195,6 +197,11 @@ class Waypoints {
 
         ClientTickEvents.END_CLIENT_TICK.register {
             MinecraftClient.getInstance().player?.let {
+                if (it.health == 0f && System.currentTimeMillis() - lastDeathPing > 30 * 1000 && MinecraftClient.getInstance().currentScreen !is DeathScreen) {
+                    sendPing("death", false)
+                    lastDeathPing = System.currentTimeMillis()
+                }
+
                 if (System.currentTimeMillis() - lastLowHPPing > 1000 && it.health <= 6) {
                     sendPing("lowhp", false)
                     lastLowHPPing = System.currentTimeMillis()
@@ -266,10 +273,6 @@ fun sendPing(pingType: String, isTargetedPing: Boolean) {
             )
         }
     }
-}
-
-fun onDeath() {
-    sendPing("death", false)
 }
 
 fun jsonObjectOf(vararg pairs: Pair<String, *>) =
