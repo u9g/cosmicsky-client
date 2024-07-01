@@ -30,7 +30,6 @@ fun playSound(identifier: Identifier) {
 
 fun makeWebsocket() {
     coroutineScope.launch {
-
         val ws = com.neovisionaries.ws.client.WebSocketFactory()
             .createSocket("wss://cosmicsky-server-1.onrender.com")
             .setPingInterval(10)
@@ -55,7 +54,9 @@ fun makeWebsocket() {
                             val z = parsed["z"].asInt()
                             val pingType = parsed["pingType"].asString()
 
-                            if (Settings.shouldPingMakeSounds && username != MinecraftClient.getInstance().session.username) {
+                            if (Settings.shouldPingMakeSounds &&
+                                username != MinecraftClient.getInstance().session.username
+                            ) {
                                 when (pingType) {
                                     "manual" -> {
                                         playSound(Identifier("minecraft", "block.note_block.pling"))
