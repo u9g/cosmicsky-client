@@ -19,9 +19,11 @@ class Calculator {
             it.register("calc") {
                 thenArgument("what to calculate", StringArgumentType.string()) {
                     thenExecute {
-                        val calculation = this[it]
-                        val formatted = NEUCalculator.decimalFormat.format(NEUCalculator.calculate(calculation))
-                        source.sendFeedback(Text.literal("§f$calculation §e= §a$formatted"))
+                        if (Settings.enableMod) {
+                            val calculation = this[it]
+                            val formatted = NEUCalculator.decimalFormat.format(NEUCalculator.calculate(calculation))
+                            source.sendFeedback(Text.literal("§f$calculation §e= §a$formatted"))
+                        }
                     }
                 }
             }

@@ -13,6 +13,8 @@ object Settings {
     var disableSwingingAtLowDurability: Boolean = true
     var shouldPingMakeSounds: Boolean = true
     var shouldShowDeathPings: Boolean = true
+    var replaceFixToFixAll: Boolean = true
+    var enableMod: Boolean = false
 
     fun start() {
         CommandCallback.event.register {

@@ -34,7 +34,7 @@ suspend fun makeWebsocket() {
     withContext(MinecraftDispatcher) {
         async(coroutineContext) {
             webSocket = com.neovisionaries.ws.client.WebSocketFactory()
-                .createSocket("wss://cosmicsky-server-1.onrender.com")
+                .createSocket("wss://cosmicsky-server.onrender.com")
                 .setPingInterval(10)
                 .addListener(object : WebSocketAdapter() {
                     override fun onTextMessage(ws: WebSocket, message: String) {
@@ -111,12 +111,20 @@ suspend fun makeWebsocket() {
                                             Settings.disableSwingingAtLowDurability = parsed["value"].asBoolean()
                                         }
 
-                                        "ping_sound" -> {
+                                        "should_ping_make_sounds" -> {
                                             Settings.shouldPingMakeSounds = parsed["value"].asBoolean()
                                         }
 
                                         "should_show_death_pings" -> {
                                             Settings.shouldShowDeathPings = parsed["value"].asBoolean()
+                                        }
+
+                                        "replace_fix_to_fix_all" -> {
+                                            Settings.replaceFixToFixAll = parsed["value"].asBoolean()
+                                        }
+
+                                        "enable_mod" -> {
+                                            Settings.enableMod = parsed["value"].asBoolean()
                                         }
                                     }
                                 }
