@@ -2,7 +2,6 @@ package dev.u9g.features
 
 import com.eclipsesource.json.Json
 import dev.u9g.events.WorldRenderLastCallback
-import dev.u9g.isOnline
 import dev.u9g.mc
 import dev.u9g.util.FirmFormatters
 import dev.u9g.util.render.RenderInWorldContext
@@ -11,7 +10,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.DeathScreen
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
 import net.minecraft.text.Text
@@ -26,7 +24,7 @@ var pingsToRender = listOf<Ping>()
 const val TIME_TO_WAIT_BEFORE_TARGETED_PING = 200
 
 var lastTickDelta: Float = 0.0F
-public var lastDeathPing = System.currentTimeMillis()
+var lastDeathPing = System.currentTimeMillis()
 
 class Waypoints {
     private val pingKey = KeyBinding("Ping!", InputUtil.GLFW_KEY_F, "Pings")
@@ -182,33 +180,18 @@ class Waypoints {
                         "version" to "1.1.1"
                     )
                 )
-                isOnline = true
-            }
-        }
-
-        ClientPlayConnectionEvents.DISCONNECT.register { handler, client ->
-            val netHandler = client.networkHandler ?: return@register
-            if (handler.connection.isLocal) return@register
-            if (netHandler.world.isClient) {
-                webSocket.sendText(jsonObjectOf("type" to "disconnected"))
-                isOnline = false
             }
         }
 
         ClientTickEvents.END_CLIENT_TICK.register {
             MinecraftClient.getInstance().player?.let {
-                if (it.health == 0f && System.currentTimeMillis() - lastDeathPing > 30 * 1000 && MinecraftClient.getInstance().currentScreen !is DeathScreen) {
-                    sendPing("death", false)
-                    lastDeathPing = System.currentTimeMillis()
-                }
-
                 if (System.currentTimeMillis() - lastLowHPPing > 1000 && it.health <= 6) {
                     sendPing("lowhp", false)
                     lastLowHPPing = System.currentTimeMillis()
                 }
             }
 
-            if (startedFocusPingingTime == 0L && focusPingKey.isPressed && isOnline) {
+            if (startedFocusPingingTime == 0L && focusPingKey.isPressed) {
                 startedFocusPingingTime = System.currentTimeMillis()
             } else if (startedFocusPingingTime != 0L && !focusPingKey.isPressed) {
                 sendPing(
@@ -218,7 +201,7 @@ class Waypoints {
                 startedFocusPingingTime = 0L
             }
 
-            if (startedPingingTime == 0L && pingKey.isPressed && isOnline) {
+            if (startedPingingTime == 0L && pingKey.isPressed) {
                 startedPingingTime = System.currentTimeMillis()
             } else if (startedPingingTime != 0L && !pingKey.isPressed) {
                 sendPing(

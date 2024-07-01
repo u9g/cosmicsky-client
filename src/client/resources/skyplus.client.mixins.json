@@ -5,7 +5,9 @@
   "client": [
     "ChatScreenMixin",
     "ExampleClientMixin",
+    "InGameHudMixin",
     "MinecraftClientMixin",
+    "PlayerRendererMixin",
     "accessors.AccessorGameRenderer",
     "events.WorldRenderLastEventPatch"
   ],
