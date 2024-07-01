@@ -62,7 +62,7 @@ fun makeWebsocket() {
                                     }
 
                                     "death" -> {
-                                        playSound(Identifier("minecraft", "block.anvil.place"))
+                                        playSound(Identifier("minecraft", "entity.evoker.death"))
                                     }
                                 }
                             }
