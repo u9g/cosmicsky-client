@@ -50,6 +50,18 @@ suspend fun makeWebsocket() {
                                     val z = parsed["z"].asInt()
                                     val pingType = parsed["pingType"].asString()
 
+                                    if (Settings.shouldPingMakeSounds && username != MinecraftClient.getInstance().session.username) {
+                                        when (pingType) {
+                                            "manual" -> {
+                                                playSound(Identifier("minecraft", "block.note_block.pling"))
+                                            }
+
+                                            "death" -> {
+                                                playSound(Identifier("minecraft", "block.anvil.place"))
+                                            }
+                                        }
+                                    }
+
                                     pingsToRender =
                                         pingsToRender.filterNot { it.username == username && it.pingType != "death" } + Ping(
                                             BlockPos(x, y, z),
