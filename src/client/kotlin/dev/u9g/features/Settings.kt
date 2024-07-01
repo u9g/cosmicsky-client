@@ -10,6 +10,9 @@ import dev.u9g.webSocket
 object Settings {
     var showPingsInGame: Boolean = true
     var showPingsInChat: Boolean = false
+    var disableSwingingAtLowDurability: Boolean = true
+    var shouldPingMakeSounds: Boolean = true
+    var shouldShowDeathPings: Boolean = true
 
     fun start() {
         CommandCallback.event.register {

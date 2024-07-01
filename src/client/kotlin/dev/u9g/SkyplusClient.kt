@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.kyori.adventure.text.minimessage.MiniMessage
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.sound.PositionedSoundInstance
 import net.minecraft.sound.SoundEvent
@@ -49,11 +48,15 @@ suspend fun makeWebsocket() {
                                     val x = parsed["x"].asInt()
                                     val y = parsed["y"].asInt()
                                     val z = parsed["z"].asInt()
-                                    pingsToRender = pingsToRender.filterNot { it.username == username } + Ping(
-                                        BlockPos(x, y, z),
-                                        System.currentTimeMillis(),
-                                        username
-                                    )
+                                    val pingType = parsed["pingType"].asString()
+
+                                    pingsToRender =
+                                        pingsToRender.filterNot { it.username == username && it.pingType != "death" } + Ping(
+                                            BlockPos(x, y, z),
+                                            System.currentTimeMillis(),
+                                            username,
+                                            pingType
+                                        )
 
                                     if (Settings.showPingsInChat) {
                                         MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
@@ -65,9 +68,11 @@ suspend fun makeWebsocket() {
                                 }
 
                                 "notification" -> {
-                                    if (parsed["minimessage"] != null) {
-                                        MinecraftClient.getInstance().player?.sendMessage(
-                                            MiniMessage.miniMessage().deserialize(parsed["minimessage"].asString())
+                                    if (parsed["json"] != null) {
+                                        MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
+                                            Text.Serialization.fromLenientJson(
+                                                parsed["json"].asString()
+                                            )
                                         )
                                     } else if (parsed["message"] != null) {
                                         MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
@@ -83,16 +88,25 @@ suspend fun makeWebsocket() {
 
                                     when (settingName) {
                                         "show_pings" -> {
-                                            println(parsed["value"])
                                             Settings.showPingsInGame = parsed["value"].asBoolean()
                                         }
 
                                         "pings_sent_to_chat" -> {
                                             Settings.showPingsInChat = parsed["value"].asBoolean()
                                         }
-                                    }
 
-                                    println("settings now= ingame:${Settings.showPingsInGame} chat:${Settings.showPingsInChat}")
+                                        "allow_swinging_at_low_durability" -> {
+                                            Settings.disableSwingingAtLowDurability = parsed["value"].asBoolean()
+                                        }
+
+                                        "ping_sound" -> {
+                                            Settings.shouldPingMakeSounds = parsed["value"].asBoolean()
+                                        }
+
+                                        "should_show_death_pings" -> {
+                                            Settings.shouldShowDeathPings = parsed["value"].asBoolean()
+                                        }
+                                    }
                                 }
 
                                 else -> {

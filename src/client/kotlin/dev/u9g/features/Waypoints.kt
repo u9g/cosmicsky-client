@@ -16,7 +16,7 @@ import net.minecraft.client.util.InputUtil
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
 
-data class Ping(val pos: BlockPos, val time: Long, val username: String)
+data class Ping(val pos: BlockPos, val time: Long, val username: String, val pingType: String)
 
 var pingsToRender = listOf<Ping>()
 
@@ -30,8 +30,11 @@ class Waypoints {
         WorldRenderLastCallback.event.register { event ->
             if (pingsToRender.isEmpty()) return@register
             if (!Settings.showPingsInGame) return@register
+
             RenderInWorldContext.renderInWorld(event) {
                 pingsToRender.forEach { ping ->
+                    if (!Settings.shouldShowDeathPings && ping.pingType == "death") return@forEach
+
                     color(1f, 1f, 1f, 1f)
                     val skin =
                         mc.networkHandler?.listedPlayerListEntries?.find { it.profile.name == ping.username }
@@ -39,16 +42,45 @@ class Waypoints {
                             ?.texture
                     withFacingThePlayer(ping.pos.toCenterPos()) {
                         val secPassed = (System.currentTimeMillis() - ping.time) / 1000
-                        if (secPassed > 0) {
+                        val minPassed = secPassed / 60
+                        val deathPrefix = if (ping.pingType == "death") {
+                            "§4§lDEATH PING §r"
+                        } else {
+                            ""
+                        }
+                        if (minPassed > 0) {
                             text(
                                 Text.literal(ping.username),
-                                Text.literal("§e${FirmFormatters.formatDistance(mc.player?.pos?.distanceTo(ping.pos.toCenterPos()) ?: 42069.0)}" + " ꞏ " + secPassed.toString() + "s ago"),
+                                Text.literal(
+                                    deathPrefix + "§e${FirmFormatters.formatDistance(mc.player?.pos?.distanceTo(ping.pos.toCenterPos()) ?: 42069.0)}" + " ꞏ " + minPassed.toString() + "m ago"
+                                ),
+                            )
+                        } else if (secPassed > 0) {
+                            text(
+                                Text.literal(ping.username),
+                                Text.literal(
+                                    deathPrefix + "§e${
+                                        FirmFormatters.formatDistance(
+                                            mc.player?.pos?.distanceTo(
+                                                ping.pos.toCenterPos()
+                                            ) ?: 42069.0
+                                        )
+                                    }" + " ꞏ " + secPassed.toString() + "s ago"
+                                ),
                             )
 
                         } else {
                             text(
                                 Text.literal(ping.username),
-                                Text.literal("§e${FirmFormatters.formatDistance(mc.player?.pos?.distanceTo(ping.pos.toCenterPos()) ?: 42069.0)}")
+                                Text.literal(
+                                    deathPrefix + "§e${
+                                        FirmFormatters.formatDistance(
+                                            mc.player?.pos?.distanceTo(
+                                                ping.pos.toCenterPos()
+                                            ) ?: 42069.0
+                                        )
+                                    }"
+                                )
                             )
                         }
                         if (skin != null) {
@@ -100,6 +132,7 @@ class Waypoints {
                 webSocket.sendText(
                     jsonObjectOf(
                         "type" to "ping",
+                        "pingType" to "manual",
                         "x" to block.x,
                         "y" to block.y,
                         "z" to block.z
@@ -110,9 +143,31 @@ class Waypoints {
                 pinging = false
             }
 
-            pingsToRender = pingsToRender.filter { System.currentTimeMillis() - it.time < 60_000 }
+            pingsToRender = pingsToRender.filter {
+                when (it.pingType) {
+                    // five minutes for items to despawn + 1minute to mourn the loss I guess
+                    "death" -> System.currentTimeMillis() - it.time < 6 * 60_000
+                    "manual" -> System.currentTimeMillis() - it.time < 60_000
+
+                    // should be unreachable vvv
+                    else -> System.currentTimeMillis() - it.time < 60_000
+                }
+            }
         }
     }
+}
+
+fun onDeath() {
+    val block = MinecraftClient.getInstance().player!!.blockPos
+    webSocket.sendText(
+        jsonObjectOf(
+            "type" to "ping",
+            "pingType" to "death",
+            "x" to block.x,
+            "y" to block.y,
+            "z" to block.z
+        )
+    )
 }
 
 fun jsonObjectOf(vararg pairs: Pair<String, *>) =
