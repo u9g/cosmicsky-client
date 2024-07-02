@@ -8,7 +8,7 @@ import dev.u9g.mc
 import java.text.DecimalFormat
 
 class ImHighUp {
-    private val regex = "ImHighUp's Balance: \\$([\\d,]+)".toRegex()
+    private val regex = "ImHighUp's Balance: \\$([\\d,.]+)".toRegex()
     private val decimalFormat = DecimalFormat("#,###")
 
     init {
