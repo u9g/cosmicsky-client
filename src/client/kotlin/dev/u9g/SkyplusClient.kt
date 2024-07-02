@@ -7,6 +7,7 @@ import com.neovisionaries.ws.client.WebSocketFrame
 import dev.u9g.commands.thenExecute
 import dev.u9g.events.CommandCallback
 import dev.u9g.events.CommandEvent
+import dev.u9g.events.ServerConnectCallback
 import dev.u9g.features.*
 import dev.u9g.util.Coroutines
 import dev.u9g.util.coroutineScope
@@ -22,7 +23,6 @@ import net.minecraft.util.math.BlockPos
 
 lateinit var mc: MinecraftClient
 val webSocket = SkyPlusWebSocket(null)
-lateinit var tpOutAnnouncer: TPOutAnnouncer
 
 fun playSound(identifier: Identifier) {
     mc.soundManager.play(PositionedSoundInstance.master(SoundEvent.of(identifier), 1F))
@@ -31,7 +31,7 @@ fun playSound(identifier: Identifier) {
 fun makeWebsocket() {
     coroutineScope.launch {
         val ws = com.neovisionaries.ws.client.WebSocketFactory()
-            .createSocket("wss://cosmicsky-server-1.onrender.com")
+            .createSocket("wss://cosmicsky-server.onrender.com")
             .setPingInterval(10)
             .addListener(object : WebSocketAdapter() {
                 override fun onTextMessage(ws: WebSocket, message: String) {
@@ -44,7 +44,7 @@ fun makeWebsocket() {
                             val uuid = parsed["uuid"].asString()
                             val secLeft = parsed["secLeft"].asString()
 
-                            uuid2tpOut = uuid2tpOut + Pair(uuid, TPOut(secLeft))
+                            username2tpOut = username2tpOut + Pair(uuid, TPOut(secLeft))
                         }
 
                         "ping" -> {
@@ -132,6 +132,14 @@ fun makeWebsocket() {
                                 "enable_mod" -> {
                                     Settings.enableMod = parsed["value"].asBoolean()
                                 }
+
+                                "what_adventure_to_display" -> {
+                                    Settings.whatAdventureToDisplay = if (parsed["value"].isNull) {
+                                        null
+                                    } else {
+                                        parsed["value"].asString()
+                                    }
+                                }
                             }
                         }
 
@@ -145,22 +153,15 @@ fun makeWebsocket() {
                     MinecraftClient.getInstance().player?.sendMessage(Text.of("skyplus > websocket connected"))
                     super.onConnected(websocket, headers)
 
-                    if (webSocket.shouldSendConnectPacketOnWSConnect) {
-                        val netHandler = mc.networkHandler
-                        if (netHandler != null &&
-                            netHandler.connection?.isLocal == false &&
-                            netHandler.world?.isClient == true
-                        ) {
-                            webSocket.sendText(
-                                jsonObjectOf(
-                                    "type" to "connected",
-                                    "username" to MinecraftClient.getInstance().session.username,
-                                    "uuid" to MinecraftClient.getInstance().player!!.uuidAsString,
-                                    "version" to "1.1.1"
-                                )
+                    MinecraftClient.getInstance().session.uuidOrNull?.let {
+                        webSocket.sendText(
+                            jsonObjectOf(
+                                "type" to "connected",
+                                "username" to MinecraftClient.getInstance().session.username,
+                                "uuid" to it.toString(),
+                                "version" to "1.2.0"
                             )
-                            webSocket.shouldSendConnectPacketOnWSConnect = false
-                        }
+                        )
                     }
                 }
 
@@ -180,8 +181,6 @@ fun makeWebsocket() {
 }
 
 class SkyPlusWebSocket(var ws: WebSocket?) {
-    var shouldSendConnectPacketOnWSConnect = false
-
     fun sendText(text: String) {
         val currWs = ws
         if (currWs?.isOpen == true) {
@@ -197,12 +196,13 @@ object SkyplusClient : ClientModInitializer {
         println("SkyPlus-Client starting.")
         JavaMain.LOGGER.info("SkyPlus-Client starting. VIA LOGGER")
         mc = MinecraftClient.getInstance()
-        makeWebsocket()
+        ServerConnectCallback.event.register {
+            makeWebsocket()
+        }
         CommandCallback.event.register {
             it.register("skyplusre") {
                 thenExecute {
                     webSocket.ws = null
-                    webSocket.shouldSendConnectPacketOnWSConnect = true
 
                     makeWebsocket()
                 }
@@ -213,7 +213,8 @@ object SkyplusClient : ClientModInitializer {
         Coroutines()
         Teams()
         Settings.start()
-        tpOutAnnouncer = TPOutAnnouncer()
+//        TPOutAnnouncer()
+//        WhatAdventure()
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
             CommandCallback.event.invoker().invoke(CommandEvent(dispatcher, ctx, mc.networkHandler?.commandDispatcher))

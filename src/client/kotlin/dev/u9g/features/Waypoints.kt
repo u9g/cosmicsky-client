@@ -8,7 +8,6 @@ import dev.u9g.util.render.RenderInWorldContext
 import dev.u9g.webSocket
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
@@ -164,22 +163,6 @@ class Waypoints {
                         }
                     }
                 }
-            }
-        }
-
-        ClientPlayConnectionEvents.JOIN.register { handler, _, client ->
-            val netHandler = client.networkHandler ?: return@register
-            if (handler.connection.isLocal) return@register
-            if (netHandler.world.isClient) {
-                println("skyplus > sent connected")
-                webSocket.sendText(
-                    jsonObjectOf(
-                        "type" to "connected",
-                        "username" to MinecraftClient.getInstance().session.username,
-                        "uuid" to MinecraftClient.getInstance().player!!.uuidAsString,
-                        "version" to "1.1.1"
-                    )
-                )
             }
         }
 

@@ -15,6 +15,18 @@ object Settings {
     var shouldShowDeathPings: Boolean = true
     var replaceFixToFixAll: Boolean = true
     var enableMod: Boolean = false
+    private var internalWhatAdventureToDisplay: String? = null
+    var whatAdventureToDisplay: String?
+        get() = internalWhatAdventureToDisplay
+        set(value) {
+            webSocket.sendText(
+                jsonObjectOf(
+                    "type" to "settingsCmd",
+                    "cmd" to "what_adventure_to_display ${value.toString()}"
+                )
+            )
+            internalWhatAdventureToDisplay = value
+        }
 
     fun start() {
         CommandCallback.event.register {

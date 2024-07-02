@@ -1,8 +1,8 @@
 package dev.u9g.events
 
 import net.fabricmc.fabric.api.event.EventFactory
-import net.minecraft.client.network.AbstractClientPlayerEntity
 import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.entity.Entity
 import net.minecraft.text.Text
 import java.util.function.Consumer
 
@@ -24,7 +24,7 @@ fun interface HeadingRendererCallback {
 data class HeadingRendererEvent(
     val distance: Double,
     val matrixStack: MatrixStack,
-    val entity: AbstractClientPlayerEntity,
+    val entity: Entity,
     val renderer: Consumer<Text>
 )
 
