@@ -1,6 +1,7 @@
 package dev.u9g.mixin.client;
 
-import dev.u9g.features.WaypointsKt;
+import dev.u9g.events.ChatMessageReceivedCallback;
+import dev.u9g.events.MessageReceivedEvent;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.text.Text;
@@ -14,9 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class ChatHudMixin {
     @Inject(at = @At("HEAD"), method = "logChatMessage", locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     private void skyplus$write(Text message, MessageIndicator indicator, CallbackInfo ci) {
-        if (System.currentTimeMillis() - WaypointsKt.getLastDeathPing() > 5000 && message.getString().trim().equals("(!) Oh no, you have died!")) {
-            WaypointsKt.sendPing("death", false);
-            WaypointsKt.setLastDeathPing(System.currentTimeMillis());
-        }
+        ChatMessageReceivedCallback.getEvent().invoker().invoke(new MessageReceivedEvent(message, message.getString().trim()));
     }
 }

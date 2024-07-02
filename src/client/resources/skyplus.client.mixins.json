@@ -9,7 +9,6 @@
     "ExampleClientMixin",
     "InGameHudMixin",
     "MinecraftClientMixin",
-    "SaveCursorPositionPatch",
     "accessors.AccessorGameRenderer",
     "events.WorldRenderLastEventPatch"
   ],

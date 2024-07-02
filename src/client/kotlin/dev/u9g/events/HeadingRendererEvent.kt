@@ -27,14 +27,3 @@ data class HeadingRendererEvent(
     val entity: Entity,
     val renderer: Consumer<Text>
 )
-
-//fun interface RendererInterface {
-//    fun render(
-//        player: AbstractClientPlayerEntity?,
-//        component: Text?,
-//        stack: MatrixStack?,
-//        source: VertexConsumerProvider?,
-//        packedLight: Int,
-//        partialTicks: Float
-//    )
-//}

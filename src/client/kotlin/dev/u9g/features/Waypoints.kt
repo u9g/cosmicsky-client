@@ -1,6 +1,7 @@
 package dev.u9g.features
 
 import com.eclipsesource.json.Json
+import dev.u9g.events.ChatMessageReceivedCallback
 import dev.u9g.events.WorldRenderLastCallback
 import dev.u9g.mc
 import dev.u9g.util.FirmFormatters
@@ -203,6 +204,13 @@ class Waypoints {
                     // should be unreachable vvv
                     else -> System.currentTimeMillis() - it.time < 60_000
                 }
+            }
+        }
+
+        ChatMessageReceivedCallback.event.register {
+            if (System.currentTimeMillis() - lastDeathPing > 5000 && it.msg == "(!) Oh no, you have died!") {
+                sendPing("death", false)
+                lastDeathPing = System.currentTimeMillis()
             }
         }
     }
