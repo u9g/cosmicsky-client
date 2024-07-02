@@ -5,9 +5,11 @@ import dev.u9g.events.ChatMessageReceivedCallback
 import dev.u9g.events.CommandCallback
 import dev.u9g.features.Settings
 import dev.u9g.mc
+import java.text.DecimalFormat
 
 class ImHighUp {
-    val regex = "ImHighUp's Balance: \\$([\\d,]+)".toRegex()
+    private val regex = "ImHighUp's Balance: \\$([\\d,]+)".toRegex()
+    private val decimalFormat = DecimalFormat("#,###")
 
     init {
         CommandCallback.event.register {
@@ -33,12 +35,12 @@ class ImHighUp {
                         val jpTickets = balanceAsNumber / 10_000
 
                         val jpTicketsString = if (jpTickets > 0) {
-                            " or $jpTickets jackpot tickets"
+                            "enough for a cf or $jpTickets jackpot tickets"
                         } else {
-                            ""
+                            "$${decimalFormat.format(10_000 - balanceAsNumber)} away from a cf"
                         }
 
-                        mc.player?.networkHandler?.sendChatMessage("ImHighUp's Balance: $$balanceWithUnderscores (enough for a cf${jpTicketsString})")
+                        mc.player?.networkHandler?.sendChatMessage("ImHighUp's Balance: $$balanceWithUnderscores (${jpTicketsString})")
                     }
                 }
             }

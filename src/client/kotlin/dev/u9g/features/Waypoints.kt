@@ -13,6 +13,7 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
 import net.minecraft.text.Text
+import net.minecraft.util.Identifier
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.BlockPos
 import kotlin.math.floor
@@ -32,6 +33,7 @@ class Waypoints {
     private var startedPingingTime: Long = 0L
     private var startedFocusPingingTime: Long = 0L
     private var lastLowHPPing = System.currentTimeMillis()
+    private val starIndicator = Identifier("skyplus", "newitemmarks.png")
 
     init {
         KeyBindingHelper.registerKeyBinding(pingKey)
@@ -84,14 +86,17 @@ class Waypoints {
                         }
                     }
                 }
+
                 pingsToRender.forEach { ping ->
                     if (!Settings.shouldShowDeathPings && ping.pingType == "death") return@forEach
 
                     color(1f, 1f, 1f, 1f)
+
                     val skin =
                         mc.networkHandler?.listedPlayerListEntries?.find { it.profile.name == ping.username }
                             ?.skinTextures
                             ?.texture
+
                     withFacingThePlayer(ping.pos.toCenterPos()) {
                         val secPassed = (System.currentTimeMillis() - ping.time) / 1000
                         val minPassed = secPassed / 60
@@ -161,6 +166,16 @@ class Waypoints {
                                 5 / 8f, 1 / 8f,
                                 6 / 8f, 2 / 8f,
                             )
+
+                            if (secPassed <= 10) {
+                                matrixStack.scale(2F, 2F, 1F)
+                                matrixStack.translate(3F, -5F, 0F)
+                                texture(
+                                    starIndicator, 8, 8,
+                                    0 / 8f, 0 / 8f,
+                                    3 / 8f, 3 / 8f,
+                                )
+                            }
                         }
                     }
                 }
