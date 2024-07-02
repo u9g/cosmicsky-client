@@ -6,10 +6,11 @@ import dev.u9g.events.CommandCallback
 import dev.u9g.features.Settings
 import dev.u9g.mc
 import java.text.DecimalFormat
+import kotlin.math.ceil
 
 class ImHighUp {
     private val regex = "ImHighUp's Balance: \\$([\\d,.]+)".toRegex()
-    private val decimalFormat = DecimalFormat("#,###")
+    private val addCommas = DecimalFormat("#,###")
 
     init {
         CommandCallback.event.register {
@@ -27,9 +28,12 @@ class ImHighUp {
                 val matched = regex.matchEntire(it.msg)
 
                 if (matched != null) {
-                    val (balanceWithUnderscores) = matched.destructured
+                    val (balanceWithCommas) = matched.destructured
 
-                    val balanceAsNumber = balanceWithUnderscores.replace(",", "").toIntOrNull(10)
+                    val balanceAsNumber = balanceWithCommas.replace(",", "")
+                        .toDoubleOrNull()?.let { d ->
+                            ceil(d).toInt()
+                        }
 
                     if (balanceAsNumber != null) {
                         val jpTickets = balanceAsNumber / 10_000
@@ -37,10 +41,10 @@ class ImHighUp {
                         val jpTicketsString = if (jpTickets > 0) {
                             "enough for a cf or $jpTickets jackpot tickets"
                         } else {
-                            "$${decimalFormat.format(10_000 - balanceAsNumber)} away from a cf"
+                            "$${addCommas.format(10_000 - balanceAsNumber)} away from a cf"
                         }
 
-                        mc.player?.networkHandler?.sendChatMessage("ImHighUp's Balance: $$balanceWithUnderscores (${jpTicketsString})")
+                        mc.player?.networkHandler?.sendChatMessage("ImHighUp's Balance: $$balanceWithCommas (${jpTicketsString})")
                     }
                 }
             }

@@ -14,7 +14,7 @@ class MobCps {
     init {
         LivingEntityDeathCallback.event.register {
             mc.player?.distanceTo(it.entity)?.let { dist ->
-                if (dist < 1) {
+                if (dist < 3) {
                     rollingAverage.addEvent()
                 }
             }
