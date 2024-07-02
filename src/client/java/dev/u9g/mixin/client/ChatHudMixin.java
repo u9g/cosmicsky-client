@@ -1,7 +1,6 @@
 package dev.u9g.mixin.client;
 
 import dev.u9g.events.ChatMessageReceivedCallback;
-import dev.u9g.events.MessageReceivedEvent;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.text.Text;
