@@ -150,7 +150,7 @@ fun makeWebsocket() {
                 }
 
                 override fun onConnected(websocket: WebSocket?, headers: MutableMap<String, MutableList<String>>?) {
-                    MinecraftClient.getInstance().player?.sendMessage(Text.of("skyplus > websocket connected"))
+                    MinecraftClient.getInstance().player?.sendMessage(Text.of("§b§l(!) SkyPlus -> §eWebsocket successfully connected!"))
                     super.onConnected(websocket, headers)
 
                     MinecraftClient.getInstance().session.uuidOrNull?.let {
@@ -171,7 +171,7 @@ fun makeWebsocket() {
                     clientCloseFrame: WebSocketFrame?,
                     closedByServer: Boolean
                 ) {
-                    MinecraftClient.getInstance().player?.sendMessage(Text.of("websocket disconnected, reconnect with /skyplusre"))
+                    MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l(!) SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre"))
                     super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
                 }
             })
@@ -186,7 +186,7 @@ class SkyPlusWebSocket(var ws: WebSocket?) {
         if (currWs?.isOpen == true) {
             currWs.sendText(text)
         } else {
-            MinecraftClient.getInstance().player?.sendMessage(Text.of("websocket disconnected, reconnect with /skyplusre"))
+            MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l(!) SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre"))
         }
     }
 }
@@ -207,6 +207,7 @@ object SkyplusClient : ClientModInitializer {
                     makeWebsocket()
                 }
             }
+
         }
         Waypoints()
         Calculator()
