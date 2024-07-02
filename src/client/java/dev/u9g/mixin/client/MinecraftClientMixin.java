@@ -25,7 +25,7 @@ public class MinecraftClientMixin {
         ItemStack item = this.player.getStackInHand(Hand.MAIN_HAND);
         if (Settings.INSTANCE.getEnableMod() && Settings.INSTANCE.getDisableSwingingAtLowDurability() && item.getMaxDamage() - item.getDamage() < 10 && item.getItem().isDamageable()) {
             cir.setReturnValue(false);
-            this.player.sendMessage(Text.of("Can't hit anymore, item durability is <10. Toggle this in /skyplussettings"));
+            this.player.sendMessage(Text.of("§c§l(!) §cYou cannot hit anymore! Item durability is below 10! §eYou can toggle this in /skyplussettings"));
         }
     }
 }
