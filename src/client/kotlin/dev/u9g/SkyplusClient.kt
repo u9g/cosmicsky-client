@@ -44,7 +44,7 @@ fun makeWebsocket() {
                             val uuid = parsed["uuid"].asString()
                             val secLeft = parsed["secLeft"].asString()
 
-                            username2tpOut = username2tpOut + Pair(uuid, TPOut(secLeft))
+                            uuid2tpOut = uuid2tpOut + Pair(uuid, TPOut(secLeft))
                         }
 
                         "ping" -> {
@@ -213,7 +213,8 @@ object SkyplusClient : ClientModInitializer {
         Coroutines()
         Teams()
         Settings.start()
-//        TPOutAnnouncer()
+        AreaFishedOut()
+        TPOutAnnouncer()
 //        WhatAdventure()
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
