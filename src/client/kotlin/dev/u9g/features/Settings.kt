@@ -14,7 +14,9 @@ object Settings {
     var shouldPingMakeSounds: Boolean = true
     var shouldShowDeathPings: Boolean = true
     var replaceFixToFixAll: Boolean = true
+    var shouldShowMobsPerSecond: Boolean = true
     var enableMod: Boolean = false
+
     private var internalWhatAdventureToDisplay: String? = null
     var whatAdventureToDisplay: String?
         get() = internalWhatAdventureToDisplay

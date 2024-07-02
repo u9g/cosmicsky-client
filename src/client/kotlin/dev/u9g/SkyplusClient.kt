@@ -134,6 +134,10 @@ fun makeWebsocket() {
                                     Settings.enableMod = parsed["value"].asBoolean()
                                 }
 
+                                "should_show_mobs_per_second" -> {
+                                    Settings.shouldShowMobsPerSecond = parsed["value"].asBoolean()
+                                }
+
                                 "what_adventure_to_display" -> {
                                     Settings.whatAdventureToDisplay = if (parsed["value"].isNull) {
                                         null
@@ -160,7 +164,7 @@ fun makeWebsocket() {
                                 "type" to "connected",
                                 "username" to MinecraftClient.getInstance().session.username,
                                 "uuid" to it.toString(),
-                                "version" to "1.2.0"
+                                "version" to "1.2.1"
                             )
                         )
                     }
@@ -218,6 +222,7 @@ object SkyplusClient : ClientModInitializer {
         AreaFishedOut()
         TPOutAnnouncer()
         ImHighUp()
+        MobCps()
 //        WhatAdventure()
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
