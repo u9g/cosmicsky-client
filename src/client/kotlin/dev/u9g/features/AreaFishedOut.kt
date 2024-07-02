@@ -7,7 +7,7 @@ import net.minecraft.util.Identifier
 class AreaFishedOut {
     init {
         ChatMessageReceivedCallback.event.register {
-            if (it.msg == "(!) It seems this area has been fished out!") {
+            if (Settings.enableMod && it.msg == "(!) It seems this area has been fished out!") {
                 playSound(Identifier("minecraft", "block.amethyst_block.break"))
             }
         }

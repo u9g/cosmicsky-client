@@ -9,6 +9,7 @@ import dev.u9g.events.CommandCallback
 import dev.u9g.events.CommandEvent
 import dev.u9g.events.ServerConnectCallback
 import dev.u9g.features.*
+import dev.u9g.features.`fun`.ImHighUp
 import dev.u9g.util.Coroutines
 import dev.u9g.util.coroutineScope
 import kotlinx.coroutines.launch
@@ -216,6 +217,7 @@ object SkyplusClient : ClientModInitializer {
         Settings.start()
         AreaFishedOut()
         TPOutAnnouncer()
+        ImHighUp()
 //        WhatAdventure()
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
