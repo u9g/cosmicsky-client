@@ -223,6 +223,7 @@ object SkyplusClient : ClientModInitializer {
         TPOutAnnouncer()
         ImHighUp()
         MobCps()
+        CooldownHud()
 //        WhatAdventure()
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
