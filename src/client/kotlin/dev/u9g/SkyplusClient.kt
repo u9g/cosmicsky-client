@@ -145,6 +145,9 @@ fun makeWebsocket() {
                                         parsed["value"].asString()
                                     }
                                 }
+                                "cooldown_hud" -> {
+                                    Settings.cooldownHud = parsed["value"].asBoolean()
+                                }
                             }
                         }
 
@@ -176,7 +179,7 @@ fun makeWebsocket() {
                     clientCloseFrame: WebSocketFrame?,
                     closedByServer: Boolean
                 ) {
-                    MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l(!) SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre"))
+                    MinecraftClient.getInstance().player?.sendMessage(Text.of("§c§l(!) SEVERE!!! §cWebsocket disconnected! Reconnect with /skyplusre"))
                     super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
                 }
             })
@@ -191,7 +194,7 @@ class SkyPlusWebSocket(var ws: WebSocket?) {
         if (currWs?.isOpen == true) {
             currWs.sendText(text)
         } else {
-            MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l(!) SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre"))
+            MinecraftClient.getInstance().player?.sendMessage(Text.of("§c§l(!) SEVERE!!! §cWebsocket disconnected! Reconnect with /skyplusre"))
         }
     }
 }

@@ -16,6 +16,7 @@ object Settings {
     var replaceFixToFixAll: Boolean = true
     var shouldShowMobsPerSecond: Boolean = true
     var enableMod: Boolean = false
+    var cooldownHud: Boolean = true;
 
     private var internalWhatAdventureToDisplay: String? = null
     var whatAdventureToDisplay: String?

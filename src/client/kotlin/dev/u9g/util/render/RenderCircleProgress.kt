@@ -19,6 +19,10 @@ object RenderCircleProgress {
         u2: Float,
         v1: Float,
         v2: Float,
+        red: Int = 255,
+        green: Int = 255,
+        blue: Int = 255,
+        alpha: Int = 255
     ) {
         RenderSystem.setShaderTexture(0, texture)
         RenderSystem.setShader { GameRenderer.getPositionColorTexProgram() }
@@ -26,7 +30,7 @@ object RenderCircleProgress {
         val matrix: Matrix4f = drawContext.matrices.peek().positionMatrix
         val bufferBuilder = Tessellator.getInstance().buffer
         bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLES, VertexFormats.POSITION_COLOR_TEXTURE)
-        bufferBuilder.fixedColor(255, 255, 255, 255)
+        bufferBuilder.fixedColor(red, green, blue, alpha)
 
         val corners = listOf(
             Vector2f(0F, -1F),
