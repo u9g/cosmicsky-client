@@ -44,7 +44,7 @@ class ImHighUp {
                             "$${addCommas.format(10_000 - balanceAsNumber)} away from a cf"
                         }
 
-                        mc.player?.networkHandler?.sendChatMessage("ImHighUp's Balance: $$balanceWithCommas (${jpTicketsString})")
+                        mc.player?.networkHandler?.sendChatMessage("ImHighUp's Balance: $$balanceAsNumber (${jpTicketsString})")
                     }
                 }
             }
