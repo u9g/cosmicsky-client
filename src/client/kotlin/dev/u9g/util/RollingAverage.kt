@@ -1,4 +1,4 @@
-package dev.u9g.util;
+package dev.u9g.util
 
 import java.util.*
 
@@ -13,7 +13,7 @@ class RollingAverage {
             override fun run() {
                 cleanUpOldEvents()
             }
-        }, 1000, 1000)
+        }, 200, 200)
     }
 
     fun addEvent() {
@@ -26,14 +26,14 @@ class RollingAverage {
     fun getRollingAverage(): Double {
         synchronized(lock) {
             cleanUpOldEvents()
-            return events.size / 60.0
+            return events.size / 1.0
         }
     }
 
     private fun cleanUpOldEvents() {
-        val oneMinuteAgo = System.currentTimeMillis() - 60000
+        val inLastInterval = System.currentTimeMillis() - 1000
         synchronized(lock) {
-            while (events.isNotEmpty() && events.peekFirst() < oneMinuteAgo) {
+            while (events.isNotEmpty() && events.peekFirst() < inLastInterval) {
                 events.removeFirst()
             }
         }
