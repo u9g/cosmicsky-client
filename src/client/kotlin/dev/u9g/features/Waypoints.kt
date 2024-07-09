@@ -18,7 +18,7 @@ import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.BlockPos
 import kotlin.math.floor
 
-data class Ping(val pos: BlockPos, val time: Long, val username: String, val pingType: String)
+data class Ping(val pos: BlockPos, val time: Long, val username: String, val pingType: String, val worldName: String)
 
 var pingsToRender = listOf<Ping>()
 
@@ -88,7 +88,14 @@ class Waypoints {
                 }
 
                 pingsToRender.forEach { ping ->
-                    if (!Settings.shouldShowDeathPings && ping.pingType == "death") return@forEach
+                    val worldName = MinecraftClient.getInstance().world?.registryKey?.value?.path.let {
+                        when (it) {
+                            "*" -> "*_" // if the world is actually called *, use the name *_
+                            else -> it
+                        }
+                    } ?: "*" // if you can't get a world, send to * which will be shown to everyone
+
+                    if (ping.worldName != "*" && ping.worldName != worldName) return@forEach
 
                     color(1f, 1f, 1f, 1f)
 
@@ -190,24 +197,26 @@ class Waypoints {
                 }
             }
 
-            if (startedFocusPingingTime == 0L && focusPingKey.isPressed) {
-                startedFocusPingingTime = System.currentTimeMillis()
-            } else if (startedFocusPingingTime != 0L && !focusPingKey.isPressed) {
-                sendPing(
-                    "focus",
-                    System.currentTimeMillis() - startedFocusPingingTime > TIME_TO_WAIT_BEFORE_TARGETED_PING
-                )
-                startedFocusPingingTime = 0L
-            }
+            if (MinecraftClient.getInstance().currentScreen == null) {
+                if (startedFocusPingingTime == 0L && focusPingKey.isPressed) {
+                    startedFocusPingingTime = System.currentTimeMillis()
+                } else if (startedFocusPingingTime != 0L && !focusPingKey.isPressed) {
+                    sendPing(
+                        "focus",
+                        System.currentTimeMillis() - startedFocusPingingTime > TIME_TO_WAIT_BEFORE_TARGETED_PING
+                    )
+                    startedFocusPingingTime = 0L
+                }
 
-            if (startedPingingTime == 0L && pingKey.isPressed) {
-                startedPingingTime = System.currentTimeMillis()
-            } else if (startedPingingTime != 0L && !pingKey.isPressed) {
-                sendPing(
-                    "manual",
-                    System.currentTimeMillis() - startedPingingTime > TIME_TO_WAIT_BEFORE_TARGETED_PING
-                )
-                startedPingingTime = 0L
+                if (startedPingingTime == 0L && pingKey.isPressed) {
+                    startedPingingTime = System.currentTimeMillis()
+                } else if (startedPingingTime != 0L && !pingKey.isPressed) {
+                    sendPing(
+                        "manual",
+                        System.currentTimeMillis() - startedPingingTime > TIME_TO_WAIT_BEFORE_TARGETED_PING
+                    )
+                    startedPingingTime = 0L
+                }
             }
 
             pingsToRender = pingsToRender.filter {
@@ -232,15 +241,22 @@ class Waypoints {
 }
 
 fun sendPing(pingType: String, isTargetedPing: Boolean) {
+    val worldName = MinecraftClient.getInstance().world?.registryKey?.value?.path.let {
+        when (it) {
+            "*" -> "*_" // if the world is actually called *, use the name *_
+            else -> it
+        }
+    } ?: "*" // if you can't get a world, send to * which will be shown to everyone
+
     when (isTargetedPing) {
         true -> {
             val raycasted = MinecraftClient.getInstance().player!!.raycast(5000.0, lastTickDelta, false)
             if (raycasted.type == HitResult.Type.BLOCK) {
-                raycasted.pos
                 webSocket.sendText(
                     jsonObjectOf(
                         "type" to "ping",
                         "pingType" to pingType,
+                        "worldName" to worldName,
                         "x" to floor(raycasted.pos.x).toInt(),
                         "y" to floor(raycasted.pos.y).toInt(),
                         "z" to floor(raycasted.pos.z).toInt()
@@ -255,6 +271,7 @@ fun sendPing(pingType: String, isTargetedPing: Boolean) {
                 jsonObjectOf(
                     "type" to "ping",
                     "pingType" to pingType,
+                    "worldName" to worldName,
                     "x" to block.x,
                     "y" to block.y,
                     "z" to block.z

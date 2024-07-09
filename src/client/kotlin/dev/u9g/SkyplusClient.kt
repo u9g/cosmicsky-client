@@ -64,6 +64,7 @@ fun makeWebsocket() {
                                 val y = parsed["y"].asInt()
                                 val z = parsed["z"].asInt()
                                 val pingType = parsed["pingType"].asString()
+                                val worldName = parsed["worldName"].asString()
 
                                 if (Settings.shouldPingMakeSounds &&
                                     username != MinecraftClient.getInstance().session.username
@@ -84,7 +85,8 @@ fun makeWebsocket() {
                                         BlockPos(x, y, z),
                                         System.currentTimeMillis(),
                                         username,
-                                        pingType
+                                        pingType,
+                                        worldName
                                     )
 
                                 if (Settings.showPingsInChat) {
