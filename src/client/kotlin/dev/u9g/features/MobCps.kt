@@ -20,7 +20,7 @@ class MobCps {
         }
 
         HudRenderCallback.EVENT.register { ctx, _ ->
-            val avg = rollingAverage.getRollingAverage()
+            val avg = rollingAverage.getRollingAverage().toInt()
             if (Settings.shouldShowMobsPerSecond && avg > 0 && getScoreboardLines().any {
                     it.string.startsWith("Island EXP (LVL ")
                 }) {
@@ -44,7 +44,7 @@ class MobCps {
                     // pink
                     0xff99ff
                 } else {
-                    0xffffff
+                    0xcc33ff
                 }
 
                 ctx.drawText(
