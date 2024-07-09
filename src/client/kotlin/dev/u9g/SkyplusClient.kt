@@ -132,10 +132,6 @@ fun makeWebsocket() {
                                         Settings.shouldPingMakeSounds = parsed["value"].asBoolean()
                                     }
 
-                                    "should_show_death_pings" -> {
-                                        Settings.shouldShowDeathPings = parsed["value"].asBoolean()
-                                    }
-
                                     "replace_fix_to_fix_all" -> {
                                         Settings.replaceFixToFixAll = parsed["value"].asBoolean()
                                     }
@@ -158,14 +154,6 @@ fun makeWebsocket() {
 
                                     "f_alias" -> {
                                         Settings.fAlias = parsed["value"].asBoolean()
-                                    }
-
-                                    "what_adventure_to_display" -> {
-                                        Settings.whatAdventureToDisplay = if (parsed["value"].isNull) {
-                                            null
-                                        } else {
-                                            parsed["value"].asString()
-                                        }
                                     }
                                 }
                             }
