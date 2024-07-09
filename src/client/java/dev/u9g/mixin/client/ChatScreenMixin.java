@@ -13,10 +13,15 @@ import java.util.Locale;
 public class ChatScreenMixin {
     @Inject(method = "normalize(Ljava/lang/String;)Ljava/lang/String;", at = @At("HEAD"), cancellable = true)
     private void skyplus$sendMessage(String chatText, CallbackInfoReturnable<String> cir) {
-        if (Settings.INSTANCE.getEnableMod() &&
-                Settings.INSTANCE.getReplaceFixToFixAll() &&
-                chatText.toLowerCase(Locale.ROOT).startsWith("/fix")) {
-            cir.setReturnValue("/fix all");
+        if (Settings.INSTANCE.getEnableMod()) {
+            if (Settings.INSTANCE.getReplaceFixToFixAll() &&
+                    chatText.toLowerCase(Locale.ROOT).startsWith("/fix")) {
+                cir.setReturnValue("/fix all");
+            } else if (Settings.INSTANCE.getTAlias() && chatText.toLowerCase(Locale.ROOT).equals("/t")) {
+                cir.setReturnValue("/is tp testnowpatchlatr");
+            } else if (Settings.INSTANCE.getFAlias() && chatText.toLowerCase(Locale.ROOT).equals("/f")) {
+                cir.setReturnValue("/is warp RACC000N");
+            }
         }
     }
 }
