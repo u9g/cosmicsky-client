@@ -16,6 +16,8 @@ object Settings {
     var replaceFixToFixAll: Boolean = true
     var shouldShowMobsPerSecond: Boolean = true
     var shouldAllowBreakingGlass: Boolean = false
+    var tAlias: Boolean = true
+    var fAlias: Boolean = true
     var enableMod: Boolean = false
 
     private var internalWhatAdventureToDisplay: String? = null

@@ -152,6 +152,14 @@ fun makeWebsocket() {
                                         Settings.shouldAllowBreakingGlass = parsed["value"].asBoolean()
                                     }
 
+                                    "t_alias" -> {
+                                        Settings.tAlias = parsed["value"].asBoolean()
+                                    }
+
+                                    "f_alias" -> {
+                                        Settings.fAlias = parsed["value"].asBoolean()
+                                    }
+
                                     "what_adventure_to_display" -> {
                                         Settings.whatAdventureToDisplay = if (parsed["value"].isNull) {
                                             null
