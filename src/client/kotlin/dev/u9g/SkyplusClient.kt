@@ -21,8 +21,13 @@ import net.minecraft.sound.SoundEvent
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+
 
 lateinit var mc: MinecraftClient
+var ex: ExecutorService = Executors.newSingleThreadExecutor()
 val webSocket = SkyPlusWebSocket(null)
 
 fun playSound(identifier: Identifier) {
@@ -31,158 +36,168 @@ fun playSound(identifier: Identifier) {
 
 fun makeWebsocket() {
     coroutineScope.launch {
-        val ws = com.neovisionaries.ws.client.WebSocketFactory()
-            .createSocket("wss://cosmicsky-server.onrender.com")
-            .setPingInterval(10)
-            .addListener(object : WebSocketAdapter() {
-                override fun onTextMessage(ws: WebSocket, message: String) {
-                    println("received message: $message")
+        ex.shutdownNow()
+        ex.awaitTermination(1, TimeUnit.DAYS)
+        ex = Executors.newSingleThreadExecutor()
 
-                    val parsed = Json.parse(message).asObject()
-                    val type = parsed["type"].asString()
-                    when (type) {
-                        "tpTimer" -> {
-                            val uuid = parsed["uuid"].asString()
-                            val secLeft = parsed["secLeft"].asString()
+        ex.submit {
+            val ws = com.neovisionaries.ws.client.WebSocketFactory()
+                .createSocket("wss://cosmicsky-server.onrender.com")
+                .setPingInterval(10)
+                .addListener(object : WebSocketAdapter() {
+                    override fun onTextMessage(ws: WebSocket, message: String) {
+                        println("received message: $message")
 
-                            uuid2tpOut = uuid2tpOut + Pair(uuid, TPOut(secLeft))
-                        }
+                        val parsed = Json.parse(message).asObject()
+                        val type = parsed["type"].asString()
+                        when (type) {
+                            "tpTimer" -> {
+                                val uuid = parsed["uuid"].asString()
+                                val secLeft = parsed["secLeft"].asString()
 
-                        "ping" -> {
-                            val username = parsed["username"].asString()
-                            val x = parsed["x"].asInt()
-                            val y = parsed["y"].asInt()
-                            val z = parsed["z"].asInt()
-                            val pingType = parsed["pingType"].asString()
-
-                            if (Settings.shouldPingMakeSounds &&
-                                username != MinecraftClient.getInstance().session.username
-                            ) {
-                                when (pingType) {
-                                    "manual" -> {
-                                        playSound(Identifier("minecraft", "block.note_block.pling"))
-                                    }
-
-                                    "death" -> {
-                                        playSound(Identifier("minecraft", "entity.evoker.death"))
-                                    }
-                                }
+                                uuid2tpOut = uuid2tpOut + Pair(uuid, TPOut(secLeft))
                             }
 
-                            pingsToRender =
-                                pingsToRender.filterNot { it.username == username && it.pingType != "death" } + Ping(
-                                    BlockPos(x, y, z),
-                                    System.currentTimeMillis(),
-                                    username,
-                                    pingType
-                                )
+                            "ping" -> {
+                                val username = parsed["username"].asString()
+                                val x = parsed["x"].asInt()
+                                val y = parsed["y"].asInt()
+                                val z = parsed["z"].asInt()
+                                val pingType = parsed["pingType"].asString()
 
-                            if (Settings.showPingsInChat) {
-                                MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
-                                    Text.of(
-                                        "$username pinged at ($x,$y,$z)"
-                                    )
-                                )
-                            }
-                        }
+                                if (Settings.shouldPingMakeSounds &&
+                                    username != MinecraftClient.getInstance().session.username
+                                ) {
+                                    when (pingType) {
+                                        "manual" -> {
+                                            playSound(Identifier("minecraft", "block.note_block.pling"))
+                                        }
 
-                        "notification" -> {
-                            if (parsed["json"] != null) {
-                                MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
-                                    Text.Serialization.fromLenientJson(
-                                        parsed["json"].asString()
-                                    )
-                                )
-                            } else if (parsed["message"] != null) {
-                                MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
-                                    Text.of(
-                                        parsed["message"].asString()
-                                    )
-                                )
-                            }
-                        }
-
-                        "setting" -> {
-                            val settingName = parsed["name"].asString()
-
-                            when (settingName) {
-                                "show_pings" -> {
-                                    Settings.showPingsInGame = parsed["value"].asBoolean()
-                                }
-
-                                "pings_sent_to_chat" -> {
-                                    Settings.showPingsInChat = parsed["value"].asBoolean()
-                                }
-
-                                "allow_swinging_at_low_durability" -> {
-                                    Settings.disableSwingingAtLowDurability = parsed["value"].asBoolean()
-                                }
-
-                                "should_ping_make_sounds" -> {
-                                    Settings.shouldPingMakeSounds = parsed["value"].asBoolean()
-                                }
-
-                                "should_show_death_pings" -> {
-                                    Settings.shouldShowDeathPings = parsed["value"].asBoolean()
-                                }
-
-                                "replace_fix_to_fix_all" -> {
-                                    Settings.replaceFixToFixAll = parsed["value"].asBoolean()
-                                }
-
-                                "enable_mod" -> {
-                                    Settings.enableMod = parsed["value"].asBoolean()
-                                }
-
-                                "should_show_mobs_per_second" -> {
-                                    Settings.shouldShowMobsPerSecond = parsed["value"].asBoolean()
-                                }
-
-                                "what_adventure_to_display" -> {
-                                    Settings.whatAdventureToDisplay = if (parsed["value"].isNull) {
-                                        null
-                                    } else {
-                                        parsed["value"].asString()
+                                        "death" -> {
+                                            playSound(Identifier("minecraft", "entity.evoker.death"))
+                                        }
                                     }
                                 }
-                            }
-                        }
 
-                        else -> {
-                            println("Unexpected message type from websocket: $type")
+                                pingsToRender =
+                                    pingsToRender.filterNot { it.username == username && it.pingType != "death" } + Ping(
+                                        BlockPos(x, y, z),
+                                        System.currentTimeMillis(),
+                                        username,
+                                        pingType
+                                    )
+
+                                if (Settings.showPingsInChat) {
+                                    MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
+                                        Text.of(
+                                            "$username pinged at ($x,$y,$z)"
+                                        )
+                                    )
+                                }
+                            }
+
+                            "notification" -> {
+                                if (parsed["json"] != null) {
+                                    MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
+                                        Text.Serialization.fromLenientJson(
+                                            parsed["json"].asString()
+                                        )
+                                    )
+                                } else if (parsed["message"] != null) {
+                                    MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
+                                        Text.of(
+                                            parsed["message"].asString()
+                                        )
+                                    )
+                                }
+                            }
+
+                            "setting" -> {
+                                val settingName = parsed["name"].asString()
+
+                                when (settingName) {
+                                    "show_pings" -> {
+                                        Settings.showPingsInGame = parsed["value"].asBoolean()
+                                    }
+
+                                    "pings_sent_to_chat" -> {
+                                        Settings.showPingsInChat = parsed["value"].asBoolean()
+                                    }
+
+                                    "allow_swinging_at_low_durability" -> {
+                                        Settings.disableSwingingAtLowDurability = parsed["value"].asBoolean()
+                                    }
+
+                                    "should_ping_make_sounds" -> {
+                                        Settings.shouldPingMakeSounds = parsed["value"].asBoolean()
+                                    }
+
+                                    "should_show_death_pings" -> {
+                                        Settings.shouldShowDeathPings = parsed["value"].asBoolean()
+                                    }
+
+                                    "replace_fix_to_fix_all" -> {
+                                        Settings.replaceFixToFixAll = parsed["value"].asBoolean()
+                                    }
+
+                                    "enable_mod" -> {
+                                        Settings.enableMod = parsed["value"].asBoolean()
+                                    }
+
+                                    "should_show_mobs_per_second" -> {
+                                        Settings.shouldShowMobsPerSecond = parsed["value"].asBoolean()
+                                    }
+
+                                    "should_allow_breaking_glass" -> {
+                                        Settings.shouldAllowBreakingGlass = parsed["value"].asBoolean()
+                                    }
+
+                                    "what_adventure_to_display" -> {
+                                        Settings.whatAdventureToDisplay = if (parsed["value"].isNull) {
+                                            null
+                                        } else {
+                                            parsed["value"].asString()
+                                        }
+                                    }
+                                }
+                            }
+
+                            else -> {
+                                println("Unexpected message type from websocket: $type")
+                            }
                         }
                     }
-                }
 
-                override fun onConnected(websocket: WebSocket?, headers: MutableMap<String, MutableList<String>>?) {
-                    MinecraftClient.getInstance().player?.sendMessage(Text.of("§b§l(!) SkyPlus -> §eWebsocket successfully connected!"))
-                    super.onConnected(websocket, headers)
+                    override fun onConnected(websocket: WebSocket?, headers: MutableMap<String, MutableList<String>>?) {
+                        MinecraftClient.getInstance().player?.sendMessage(Text.of("§b§l(!) SkyPlus -> §eWebsocket successfully connected!"))
+                        super.onConnected(websocket, headers)
 
-                    MinecraftClient.getInstance().session.uuidOrNull?.let {
-                        webSocket.sendText(
-                            jsonObjectOf(
-                                "type" to "connected",
-                                "username" to MinecraftClient.getInstance().session.username,
-                                "uuid" to it.toString(),
-                                "version" to "1.2.1"
+                        MinecraftClient.getInstance().session.uuidOrNull?.let {
+                            webSocket.sendText(
+                                jsonObjectOf(
+                                    "type" to "connected",
+                                    "username" to MinecraftClient.getInstance().session.username,
+                                    "uuid" to it.toString(),
+                                    "version" to "1.2.2"
+                                )
                             )
-                        )
+                        }
                     }
-                }
 
-                override fun onDisconnected(
-                    websocket: WebSocket?,
-                    serverCloseFrame: WebSocketFrame?,
-                    clientCloseFrame: WebSocketFrame?,
-                    closedByServer: Boolean
-                ) {
-                    MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l(!) SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre"))
-                    super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
-                }
-            })
-            .connect()
-        webSocket.ws = ws
-    }.start()
+                    override fun onDisconnected(
+                        websocket: WebSocket?,
+                        serverCloseFrame: WebSocketFrame?,
+                        clientCloseFrame: WebSocketFrame?,
+                        closedByServer: Boolean
+                    ) {
+                        MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l(!) SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre"))
+                        super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
+                    }
+                })
+                .connect()
+            webSocket.ws = ws
+        }
+    }
 }
 
 class SkyPlusWebSocket(var ws: WebSocket?) {
@@ -207,8 +222,6 @@ object SkyplusClient : ClientModInitializer {
         CommandCallback.event.register {
             it.register("skyplusre") {
                 thenExecute {
-                    webSocket.ws = null
-
                     makeWebsocket()
                 }
             }
@@ -223,7 +236,7 @@ object SkyplusClient : ClientModInitializer {
         TPOutAnnouncer()
         ImHighUp()
         MobCps()
-        CooldownHud()
+//        CooldownHud()
 //        WhatAdventure()
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->

@@ -15,6 +15,7 @@ object Settings {
     var shouldShowDeathPings: Boolean = true
     var replaceFixToFixAll: Boolean = true
     var shouldShowMobsPerSecond: Boolean = true
+    var shouldAllowBreakingGlass: Boolean = false
     var enableMod: Boolean = false
 
     private var internalWhatAdventureToDisplay: String? = null
