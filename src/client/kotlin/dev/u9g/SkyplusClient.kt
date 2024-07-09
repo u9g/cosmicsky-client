@@ -69,7 +69,7 @@ fun makeWebsocket() {
                                     username != MinecraftClient.getInstance().session.username
                                 ) {
                                     when (pingType) {
-                                        "manual" -> {
+                                        "manual", "focus" -> {
                                             playSound(Identifier("minecraft", "block.note_block.pling"))
                                         }
 
