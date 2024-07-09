@@ -5,20 +5,20 @@
   "client": [
     "ChatScreenMixin",
     "ClientNetworkingImplMixin",
-    "ClientPlayerEventInteractionManagerMixin",
-    "ConnectScreenMixin",
     "ExampleClientMixin",
-    "InGameHudMixin",
     "MinecraftClientMixin",
     "accessors.AccessorGameRenderer",
+    "events.ClientPlayerEventInteractionManagerMixin",
+    "events.ConnectScreenMixin",
+    "events.InGameHudMixin",
     "events.WorldRenderLastEventPatch"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "mixins": [
-    "ChatHudMixin",
-    "LivingEntityMixin",
-    "VanillaResourcePackProviderMixin"
+    "VanillaResourcePackProviderMixin",
+    "events.ChatHudMixin",
+    "events.LivingEntityMixin"
   ]
 }

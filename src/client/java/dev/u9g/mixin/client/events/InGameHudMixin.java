@@ -1,4 +1,4 @@
-package dev.u9g.mixin.client;
+package dev.u9g.mixin.client.events;
 
 import dev.u9g.events.OverlayTextCallback;
 import dev.u9g.events.OverlayTextEvent;

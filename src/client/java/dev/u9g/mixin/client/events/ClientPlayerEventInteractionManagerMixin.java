@@ -1,4 +1,4 @@
-package dev.u9g.mixin.client;
+package dev.u9g.mixin.client.events;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.u9g.events.SlotClickCallback;
