@@ -45,12 +45,12 @@ public class MinecraftClientMixin {
     private boolean skyplus$handleBlockBreaking(ClientPlayerInteractionManager instance, BlockPos pos, Direction direction, Operation<Boolean> original) {
         if (this.player == null || this.world == null) return original.call(instance, pos, direction);
 
-        if (Settings.INSTANCE.getEnableMod() && Settings.INSTANCE.getShouldAllowBreakingGlass()) {
+        if (Settings.INSTANCE.getEnableMod() && !Settings.INSTANCE.getShouldAllowBreakingGlass()) {
             BlockState bs = this.world.getBlockState(pos);
             if (!bs.isIn(BlockTags.IMPERMEABLE) && original.call(instance, pos, direction)) {
-                this.player.sendMessage(Text.of("§c§l(!) §cYou cannot break glass! Glass break is disabled! §eYou can toggle this in /skyplussettings"));
                 return true;
             }
+            this.player.sendMessage(Text.of("§c§l(!) §cYou cannot break glass! Glass break is disabled! §eYou can toggle this in /skyplussettings"));
             return false;
         } else {
             return original.call(instance, pos, direction);
