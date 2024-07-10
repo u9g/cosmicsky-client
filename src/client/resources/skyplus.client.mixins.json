@@ -7,7 +7,7 @@
     "ClientNetworkingImplMixin",
     "ExampleClientMixin",
     "MinecraftClientMixin",
-    "accessors.AccessorGameRenderer",
+    "events.ChatHudMixin",
     "events.ClientPlayerEventInteractionManagerMixin",
     "events.ConnectScreenMixin",
     "events.InGameHudMixin",

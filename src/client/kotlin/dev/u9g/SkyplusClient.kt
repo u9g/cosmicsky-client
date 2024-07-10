@@ -157,6 +157,10 @@ fun makeWebsocket() {
                                     "f_alias" -> {
                                         Settings.fAlias = parsed["value"].asBoolean()
                                     }
+
+                                    "single_escape_closes_chat" -> {
+                                        Settings.singleEscapeClosesChat = parsed["value"].asBoolean()
+                                    }
                                 }
                             }
 
@@ -201,10 +205,11 @@ fun makeWebsocket() {
 class SkyPlusWebSocket(var ws: WebSocket?) {
     fun sendText(text: String) {
         val currWs = ws
-        if (currWs?.isOpen == true) {
+        if (currWs != null) {
+            if (!currWs.isOpen) {
+                MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l(!) SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre"))
+            }
             currWs.sendText(text)
-        } else {
-            MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l(!) SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre"))
         }
     }
 }

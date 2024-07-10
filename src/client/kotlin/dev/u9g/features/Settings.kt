@@ -17,6 +17,7 @@ object Settings {
     var shouldAllowBreakingGlass: Boolean = false
     var tAlias: Boolean = true
     var fAlias: Boolean = true
+    var singleEscapeClosesChat: Boolean = true
     var enableMod: Boolean = false
 
     fun start() {
