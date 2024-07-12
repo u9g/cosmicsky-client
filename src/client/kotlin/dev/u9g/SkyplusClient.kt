@@ -180,7 +180,7 @@ fun makeWebsocket() {
                                     "type" to "connected",
                                     "username" to MinecraftClient.getInstance().session.username,
                                     "uuid" to it.toString(),
-                                    "version" to "1.2.2"
+                                    "version" to "1.2.3"
                                 )
                             )
                         }

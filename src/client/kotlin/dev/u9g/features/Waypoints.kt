@@ -6,6 +6,7 @@ import dev.u9g.events.WorldRenderLastCallback
 import dev.u9g.mc
 import dev.u9g.util.FirmFormatters
 import dev.u9g.util.render.RenderInWorldContext
+import dev.u9g.util.worldName
 import dev.u9g.webSocket
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
@@ -88,12 +89,7 @@ class Waypoints {
                 }
 
                 pingsToRender.forEach { ping ->
-                    val worldName = MinecraftClient.getInstance().world?.registryKey?.value?.path.let {
-                        when (it) {
-                            "*" -> "*_" // if the world is actually called *, use the name *_
-                            else -> it
-                        }
-                    } ?: "*" // if you can't get a world, send to * which will be shown to everyone
+                    val worldName = worldName()
 
                     if (ping.worldName != "*" && ping.worldName != worldName) return@forEach
 
@@ -241,12 +237,7 @@ class Waypoints {
 }
 
 fun sendPing(pingType: String, isTargetedPing: Boolean) {
-    val worldName = MinecraftClient.getInstance().world?.registryKey?.value?.path.let {
-        when (it) {
-            "*" -> "*_" // if the world is actually called *, use the name *_
-            else -> it
-        }
-    } ?: "*" // if you can't get a world, send to * which will be shown to everyone
+    val worldName = worldName()
 
     when (isTargetedPing) {
         true -> {
