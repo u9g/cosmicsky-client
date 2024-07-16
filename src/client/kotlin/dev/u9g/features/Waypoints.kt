@@ -1,7 +1,6 @@
 package dev.u9g.features
 
 import com.eclipsesource.json.Json
-import dev.u9g.events.ChatMessageReceivedCallback
 import dev.u9g.events.WorldRenderLastCallback
 import dev.u9g.mc
 import dev.u9g.util.FirmFormatters
@@ -186,12 +185,12 @@ class Waypoints {
         }
 
         ClientTickEvents.END_CLIENT_TICK.register {
-            MinecraftClient.getInstance().player?.let {
-                if (System.currentTimeMillis() - lastLowHPPing > 1000 && it.health <= 6) {
-                    sendPing("lowhp", false)
-                    lastLowHPPing = System.currentTimeMillis()
-                }
-            }
+//            MinecraftClient.getInstance().player?.let {
+//                if (System.currentTimeMillis() - lastLowHPPing > 1000 && it.health <= 6) {
+//                    sendPing("lowhp", false)
+//                    lastLowHPPing = System.currentTimeMillis()
+//                }
+//            }
 
             if (MinecraftClient.getInstance().currentScreen == null) {
                 if (startedFocusPingingTime == 0L && focusPingKey.isPressed) {
@@ -227,12 +226,12 @@ class Waypoints {
             }
         }
 
-        ChatMessageReceivedCallback.event.register {
-            if (System.currentTimeMillis() - lastDeathPing > 5000 && it.msg == "(!) Oh no, you have died!") {
-                sendPing("death", false)
-                lastDeathPing = System.currentTimeMillis()
-            }
-        }
+//        ChatMessageReceivedCallback.event.register {
+//            if (System.currentTimeMillis() - lastDeathPing > 5000 && it.msg == "(!) Oh no, you have died!") {
+//                sendPing("death", false)
+//                lastDeathPing = System.currentTimeMillis()
+//            }
+//        }
     }
 }
 

@@ -101,7 +101,7 @@ fun makeWebsocket() {
                             "notification" -> {
                                 if (parsed["json"] != null) {
                                     MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
-                                        Text.Serialization.fromLenientJson(
+                                        Text.Serializer.fromJson(
                                             parsed["json"].asString()
                                         )
                                     )

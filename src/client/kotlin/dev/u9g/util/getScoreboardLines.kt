@@ -1,27 +1,23 @@
 package dev.u9g.util
 
-import dev.u9g.mc
-import net.minecraft.client.gui.hud.InGameHud
-import net.minecraft.scoreboard.ScoreboardDisplaySlot
-import net.minecraft.scoreboard.Team
 import net.minecraft.text.StringVisitable
 import net.minecraft.text.Style
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.util.*
 
-fun getScoreboardLines(): List<Text> {
-    val scoreboard = mc.player?.scoreboard ?: return listOf()
-    val activeObjective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return listOf()
-    return scoreboard.getScoreboardEntries(activeObjective)
-        .filter { !it.hidden() }
-        .sortedWith(InGameHud.SCOREBOARD_ENTRY_COMPARATOR)
-        .take(15).map {
-            val team = scoreboard.getScoreHolderTeam(it.owner)
-            val text = it.name()
-            Team.decorateName(team, text)
-        }
-}
+//fun getScoreboardLines(): List<Text> {
+//    val scoreboard = mc.player?.scoreboard ?: return listOf()
+//    val activeObjective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return listOf()
+//    return scoreboard.getScoreboardEntries(activeObjective)
+//        .filter { !it.hidden() }
+//        .sortedWith(InGameHud.SCOREBOARD_ENTRY_COMPARATOR)
+//        .take(15).map {
+//            val team = scoreboard.getScoreHolderTeam(it.owner)
+//            val text = it.name()
+//            Team.decorateName(team, text)
+//        }
+//}
 
 fun Text.formattedString(): String {
     val sb = StringBuilder()

@@ -2,4 +2,4 @@ accessWidener v2 named
 
 accessible method net/minecraft/resource/ZipResourcePack$ZipFileWrapper <init> (Ljava/io/File;)V
 accessible method net/minecraft/resource/ZipResourcePack$ZipFileWrapper open ()Ljava/util/zip/ZipFile;
-accessible field net/minecraft/client/gui/hud/InGameHud SCOREBOARD_ENTRY_COMPARATOR Ljava/util/Comparator;
+#accessible field net/minecraft/client/gui/hud/InGameHud SCOREBOARD_ENTRY_COMPARATOR Ljava/util/Comparator;

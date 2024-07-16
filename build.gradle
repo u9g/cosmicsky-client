@@ -48,13 +48,6 @@ dependencies {
     include "com.eclipsesource.minimal-json:minimal-json:0.9.5"
     implementation "me.djtheredstoner:DevAuth-fabric:1.1.0"
 
-    implementation "moe.nea:libautoupdate:0.1.0"
-    include "moe.nea:libautoupdate:0.1.0"
-
-    modImplementation("moe.nea.jarvis:jarvis-api:1.0.1")
-    include("moe.nea.jarvis:jarvis-fabric:1.0.1")
-    modLocalRuntime("moe.nea.jarvis:jarvis-fabric:1.0.1")
-
     // Actual dependencies
 //    modCompileOnly('me.shedaniel:RoughlyEnoughItems-api-fabric:14.1.727') {
 //		exclude module: 'architectury'
