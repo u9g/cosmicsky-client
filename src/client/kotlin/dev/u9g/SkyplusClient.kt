@@ -12,6 +12,7 @@ import dev.u9g.features.*
 import dev.u9g.features.`fun`.ImHighUp
 import dev.u9g.util.Coroutines
 import dev.u9g.util.coroutineScope
+import dev.u9g.util.worldName
 import kotlinx.coroutines.launch
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -67,7 +68,8 @@ fun makeWebsocket() {
                                 val worldName = parsed["worldName"].asString()
 
                                 if (Settings.shouldPingMakeSounds &&
-                                    username != MinecraftClient.getInstance().session.username
+                                    username != MinecraftClient.getInstance().session.username &&
+                                    worldName == worldName()
                                 ) {
                                     when (pingType) {
                                         "manual", "focus" -> {

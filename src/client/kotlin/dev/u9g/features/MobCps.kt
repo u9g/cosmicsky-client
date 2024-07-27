@@ -1,5 +1,6 @@
 package dev.u9g.features
 
+import dev.u9g.events.ChatMessageReceivedCallback
 import dev.u9g.events.LivingEntityDeathCallback
 import dev.u9g.mc
 import dev.u9g.util.RollingAverage
@@ -55,6 +56,12 @@ class MobCps {
                     color,
                     true
                 )
+            }
+        }
+
+        ChatMessageReceivedCallback.event.register {
+            if (it.msg == "(!) Your inventory is currently full! Make some room to pickup more items!") {
+                MinecraftClient.getInstance().player?.networkHandler?.sendChatCommand("sell all")
             }
         }
     }
