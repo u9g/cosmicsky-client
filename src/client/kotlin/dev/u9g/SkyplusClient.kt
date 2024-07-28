@@ -161,14 +161,6 @@ fun makeWebsocket() {
                                     "single_escape_closes_chat" -> {
                                         Settings.singleEscapeClosesChat = parsed["value"].asBoolean()
                                     }
-
-                                    "should_hide_poi_notification" -> {
-                                        Settings.shouldHidePOINotification = parsed["value"].asBoolean()
-                                    }
-
-                                    "redirect_chat_a_to_chat_ally" -> {
-                                        Settings.redirectChatAToChatAlly = parsed["value"].asBoolean()
-                                    }
                                 }
                             }
 
@@ -248,7 +240,6 @@ object SkyplusClient : ClientModInitializer {
         ImHighUp()
         MobCps()
         IslandMembers()
-        HidePOINotification()
 //        CooldownHud()
 //        WhatAdventure()
 
