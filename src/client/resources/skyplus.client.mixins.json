@@ -10,6 +10,7 @@
     "MinecraftClientMixin",
     "events.ChatHudMixin",
     "events.ClientPlayerEventInteractionManagerMixin",
+    "events.ClientPlayNetworkHandlerMixin",
     "events.ConnectScreenMixin",
     "events.InGameHudMixin",
     "events.WorldRenderLastEventPatch"
