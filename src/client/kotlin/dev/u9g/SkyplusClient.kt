@@ -161,6 +161,10 @@ fun makeWebsocket() {
                                     "single_escape_closes_chat" -> {
                                         Settings.singleEscapeClosesChat = parsed["value"].asBoolean()
                                     }
+
+                                    "should_hide_poi_notification" -> {
+                                        Settings.shouldHidePOINotification = parsed["value"].asBoolean()
+                                    }
                                 }
                             }
 

@@ -9,19 +9,21 @@ class HidePOINotification {
     init {
         //§a§lGusty Grove
         TitleTextCallback.event.register {
-            val t = it.text
-            if (t is MutableText) {
-                val c = t.content
-                if (c is Literal) {
-                    if (t.string.startsWith("§a§l")) {
-                        it.isCancelled = true
+            if (Settings.shouldHidePOINotification) {
+                val t = it.text
+                if (t is MutableText) {
+                    val c = t.content
+                    if (c is Literal) {
+                        if (t.string.startsWith("§a§l")) {
+                            it.isCancelled = true
+                        }
                     }
                 }
             }
         }
 
         PlaySoundCallback.event.register {
-            if (it.soundKey == "entity.bat.takeoff") {
+            if (Settings.shouldHidePOINotification && it.soundKey == "entity.bat.takeoff") {
                 it.isCancelled = true
             }
         }

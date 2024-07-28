@@ -18,6 +18,7 @@ object Settings {
     var tAlias: Boolean = true
     var fAlias: Boolean = true
     var singleEscapeClosesChat: Boolean = true
+    var shouldHidePOINotification: Boolean = true
     var enableMod: Boolean = false
 
     fun start() {
