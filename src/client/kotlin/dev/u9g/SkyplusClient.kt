@@ -126,7 +126,7 @@ fun makeWebsocket() {
                                         Settings.showPingsInChat = parsed["value"].asBoolean()
                                     }
 
-                                    "allow_swinging_at_low_durability" -> {
+                                    "disable_swinging_at_low_durability" -> {
                                         Settings.disableSwingingAtLowDurability = parsed["value"].asBoolean()
                                     }
 
@@ -240,6 +240,7 @@ object SkyplusClient : ClientModInitializer {
         ImHighUp()
         MobCps()
         IslandMembers()
+        ChaoticZoneEnter()
 //        CooldownHud()
 //        WhatAdventure()
 
