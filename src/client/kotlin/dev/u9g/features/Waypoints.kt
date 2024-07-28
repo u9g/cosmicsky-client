@@ -2,6 +2,7 @@ package dev.u9g.features
 
 import com.eclipsesource.json.Json
 import dev.u9g.events.ChatMessageReceivedCallback
+import dev.u9g.events.CommandCallback
 import dev.u9g.events.WorldRenderLastCallback
 import dev.u9g.mc
 import dev.u9g.util.FirmFormatters
@@ -231,6 +232,13 @@ class Waypoints {
             if (System.currentTimeMillis() - lastDeathPing > 5000 && it.msg == "(!) Oh no, you have died!") {
                 sendPing("death", false)
                 lastDeathPing = System.currentTimeMillis()
+            }
+        }
+
+        CommandCallback.event.register {
+            it.register("fixstuckpingonmyscreen") {
+                startedPingingTime = 0
+                startedFocusPingingTime = 0
             }
         }
     }
