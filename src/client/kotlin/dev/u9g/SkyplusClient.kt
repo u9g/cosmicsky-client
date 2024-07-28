@@ -165,6 +165,10 @@ fun makeWebsocket() {
                                     "should_hide_poi_notification" -> {
                                         Settings.shouldHidePOINotification = parsed["value"].asBoolean()
                                     }
+
+                                    "redirect_chat_a_to_chat_ally" -> {
+                                        Settings.redirectChatAToChatAlly = parsed["value"].asBoolean()
+                                    }
                                 }
                             }
 

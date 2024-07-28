@@ -19,6 +19,7 @@ object Settings {
     var fAlias: Boolean = true
     var singleEscapeClosesChat: Boolean = true
     var shouldHidePOINotification: Boolean = true
+    var redirectChatAToChatAlly: Boolean = true
     var enableMod: Boolean = false
 
     fun start() {
