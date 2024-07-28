@@ -6,6 +6,7 @@
     "ChatScreenMixin",
     "ClientNetworkingImplMixin",
     "ExampleClientMixin",
+    "GenericContainerScreenMixin",
     "MinecraftClientMixin",
     "events.ChatHudMixin",
     "events.ClientPlayerEventInteractionManagerMixin",

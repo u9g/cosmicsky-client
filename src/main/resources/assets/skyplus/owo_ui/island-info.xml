@@ -1,0 +1,36 @@
+<owo-ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/wisp-forest/owo-lib/0.8/owo-ui.xsd">
+    <components>
+        <flow-layout direction="vertical">
+            <children>
+                <label id="island-members">
+                    <text>Island Members</text>
+                    <shadow>true</shadow>
+
+                    <margins>
+                        <bottom>10</bottom>
+                    </margins>
+                </label>
+
+
+                <flow-layout direction="vertical" id="island-members">
+                    <children>
+                        <label>
+                            <text>Loading</text>
+                        </label>
+                    </children>
+                </flow-layout>
+
+
+            </children>
+
+            <surface>
+                <flat>#C0101010</flat>
+            </surface>
+
+<!--            <positioning type="relative">50,10</positioning>-->
+            <horizontal-alignment>center</horizontal-alignment>
+            <vertical-alignment>center</vertical-alignment>
+        </flow-layout>
+
+    </components>
+</owo-ui>

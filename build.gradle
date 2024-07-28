@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'maven-publish'
@@ -13,11 +15,13 @@ base {
 
 repositories {
     // for releases
+    mavenLocal()
     mavenCentral()
     maven { url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" }
     maven { url = "https://maven.shedaniel.me" }
     maven { url = "https://repo.nea.moe/releases" }
     maven { url "https://repo.nea.moe/releases/" }
+//    maven { url "https://maven.wispforest.io/" }
 }
 
 loom {
@@ -67,6 +71,9 @@ dependencies {
 
     // https://github.com/RNCryptor/JNCryptor
     implementation "org.cryptonode.jncryptor:jncryptor:1.2.0"
+
+    modImplementation "io.wispforest:owo-lib:${project.owo_version}"
+    include "io.wispforest:owo-lib:${project.owo_version}"
 }
 
 processResources {
@@ -81,7 +88,7 @@ tasks.withType(JavaCompile).configureEach {
     it.options.release = 17
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         jvmTarget = 17
     }
