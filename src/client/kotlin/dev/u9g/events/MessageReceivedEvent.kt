@@ -21,4 +21,5 @@ fun interface ChatMessageReceivedCallback {
 data class ChatMessageReceivedEvent(
     val text: Text,
     val msg: String,
+    var isCancelled: Boolean
 )
