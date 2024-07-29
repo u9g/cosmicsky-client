@@ -240,6 +240,8 @@ object SkyplusClient : ClientModInitializer {
         ImHighUp()
         MobCps()
         IslandMembers()
+
+        CooldownManager()
 //        CooldownHud()
 //        WhatAdventure()
 
