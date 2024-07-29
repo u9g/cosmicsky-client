@@ -31,7 +31,9 @@ var ex: ExecutorService = Executors.newSingleThreadExecutor()
 val webSocket = SkyPlusWebSocket(null)
 
 fun playSound(identifier: Identifier) {
-    mc.soundManager.play(PositionedSoundInstance.master(SoundEvent.of(identifier), 1F))
+    MinecraftClient.getInstance().submit {
+        mc.soundManager.play(PositionedSoundInstance.master(SoundEvent.of(identifier), 1F))
+    }
 }
 
 fun makeWebsocket() {
