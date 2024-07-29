@@ -8,7 +8,6 @@
     "ExampleClientMixin",
     "GenericContainerScreenMixin",
     "MinecraftClientMixin",
-    "events.ChatHudMixin",
     "events.ClientPlayerEventInteractionManagerMixin",
     "events.ClientPlayNetworkHandlerMixin",
     "events.ConnectScreenMixin",
@@ -20,7 +19,6 @@
   },
   "mixins": [
     "VanillaResourcePackProviderMixin",
-    "events.ChatHudMixin",
     "events.LivingEntityMixin"
   ]
 }
