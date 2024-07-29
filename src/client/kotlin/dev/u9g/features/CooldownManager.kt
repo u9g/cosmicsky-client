@@ -27,20 +27,44 @@ class CooldownManager {
         ClientTickEvents.END_CLIENT_TICK.register {
             Hud.remove(Identifier("skyplus", "cooldown-hud"))
 
+            val gl = Containers.grid(Sizing.content(), Sizing.content(), 3, cooldownMap.size)
+
+            for (cooldown in cooldownMap.iterator().withIndex()) {
+                gl.child(
+                    Components.item(cooldown.value.value.icon).margins(Insets.of(2)),
+                    0,
+                    cooldown.index
+                )
+
+                gl.child(
+                    Components.label(Text.of(cooldown.value.value.color + cooldown.value.value.text))
+                        .margins(Insets.of(2)),
+                    1,
+                    cooldown.index
+                )
+
+                gl.child(
+                    Components.label(Text.of(cooldown.value.value.color + formatTime(getTimeRemaining(cooldown.value.value))))
+                        .margins(Insets.of(2)),
+                    2,
+                    cooldown.index
+                )
+            }
+
             Hud.add(Identifier("skyplus", "cooldown-hud")) {
-                Containers.horizontalFlow(Sizing.content(), Sizing.content())
-                    .children(getCooldownChildren())
-                    .verticalAlignment(VerticalAlignment.CENTER)
-                    .margins(Insets.of(3))
+                gl
+                    .horizontalAlignment(HorizontalAlignment.CENTER)
+                    .padding(Insets.of(3))
+                    .surface(Surface.VANILLA_TRANSLUCENT)
                     .positioning(Positioning.relative(50, 10))
             }
 
             val toRemove = mutableMapOf<String, Cooldown>()
-            
+
             cooldownMap.forEach { (id, cooldown) ->
                 if (cooldown.cooldownTime <= System.currentTimeMillis()) toRemove[id] = cooldown
             }
-            
+
             toRemove.forEach { (id, _) ->
                 cooldownMap.remove(id)
             }
@@ -51,7 +75,7 @@ class CooldownManager {
 
     private fun getCooldownChildren(): List<Component> {
         val cooldowns = mutableListOf<Component>()
-        
+
         cooldownMap.forEach { (_, cooldown) ->
             Containers.verticalFlow(Sizing.content(), Sizing.content())
                 .child(Components.item(cooldown.icon))
@@ -62,7 +86,7 @@ class CooldownManager {
                 .margins(Insets.of(3))
                 .also { cooldowns.add(it) }
         }
-        
+
         return cooldowns
     }
 
@@ -87,12 +111,15 @@ class CooldownManager {
     private fun listenToChatEvent() {
         ChatMessageReceivedCallback.event.register { event ->
             when (event.msg) {
-                "(!) Healed" -> cooldownMap["heal"] = Cooldown("heal", 300, "/heal", ItemStack(Items.GLISTERING_MELON_SLICE), "§c")
-                "Appetite has been satiated." -> cooldownMap["eat"] = Cooldown("eat", 300, "/eat", ItemStack(Items.COOKED_BEEF), "§e")
+                "(!) Healed" -> cooldownMap["heal"] =
+                    Cooldown("heal", 300, "/heal", ItemStack(Items.GLISTERING_MELON_SLICE), "§c")
+
+                "Appetite has been satiated." -> cooldownMap["eat"] =
+                    Cooldown("eat", 300, "/eat", ItemStack(Items.COOKED_BEEF), "§e")
             }
 
             if (event.msg.startsWith("(!) Repaired:")) {
-                cooldownMap["fix"] = Cooldown("fix", 120, "/fix", ItemStack(Items.ANVIL), "§e")
+                cooldownMap["fix"] = Cooldown("fix", 120, "/fix", ItemStack(Items.ANVIL), "§f")
             }
 
             if (event.msg.startsWith("Nearby Players") || event.msg.startsWith("(!) There is no one nearby")) {
