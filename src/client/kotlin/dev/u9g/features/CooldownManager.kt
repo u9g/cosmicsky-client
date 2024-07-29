@@ -54,7 +54,6 @@ class CooldownManager {
             Hud.add(Identifier("skyplus", "cooldown-hud")) {
                 gl
                     .horizontalAlignment(HorizontalAlignment.CENTER)
-                    .padding(Insets.of(3))
                     .surface(Surface.VANILLA_TRANSLUCENT)
                     .positioning(Positioning.relative(50, 10))
             }
