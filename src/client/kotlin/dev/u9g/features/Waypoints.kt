@@ -1,6 +1,7 @@
 package dev.u9g.features
 
 import com.eclipsesource.json.Json
+import dev.u9g.commands.thenExecute
 import dev.u9g.events.ChatMessageReceivedCallback
 import dev.u9g.events.CommandCallback
 import dev.u9g.events.WorldRenderLastCallback
@@ -237,8 +238,10 @@ class Waypoints {
 
         CommandCallback.event.register {
             it.register("fixstuckpingonmyscreen") {
-                startedPingingTime = 0
-                startedFocusPingingTime = 0
+                thenExecute {
+                    startedPingingTime = 0
+                    startedFocusPingingTime = 0
+                }
             }
         }
     }

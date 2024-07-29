@@ -163,6 +163,14 @@ fun makeWebsocket() {
                                     "single_escape_closes_chat" -> {
                                         Settings.singleEscapeClosesChat = parsed["value"].asBoolean()
                                     }
+
+                                    "should_hide_poi_notification" -> {
+                                        Settings.shouldHidePOINotification = parsed["value"].asBoolean()
+                                    }
+
+                                    "redirect_chat_a_to_chat_ally" -> {
+                                        Settings.redirectChatAToChatAlly = parsed["value"].asBoolean()
+                                    }
                                 }
                             }
 
@@ -194,7 +202,7 @@ fun makeWebsocket() {
                                     "type" to "connected",
                                     "username" to MinecraftClient.getInstance().session.username,
                                     "uuid" to it.toString(),
-                                    "version" to "1.2.3"
+                                    "version" to "1.2.4"
                                 )
                             )
                         }
@@ -257,8 +265,7 @@ object SkyplusClient : ClientModInitializer {
         ChaoticZoneEnter()
         NearFixer()
         CooldownManager()
-//        CooldownHud()
-//        WhatAdventure()
+        HidePOINotification()
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
             CommandCallback.event.invoker().invoke(CommandEvent(dispatcher, ctx, mc.networkHandler?.commandDispatcher))
