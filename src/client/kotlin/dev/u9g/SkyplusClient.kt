@@ -166,6 +166,18 @@ fun makeWebsocket() {
                                 }
                             }
 
+                            "team_members" -> {
+                                if (parsed["playerUsernames"].isArray) {
+                                    Settings.teamMembers = parsed["playerUsernames"].asArray().mapNotNull {
+                                        if (it.isString) {
+                                            it.asString()
+                                        } else {
+                                            null
+                                        }
+                                    }
+                                }
+                            }
+
                             else -> {
                                 println("Unexpected message type from websocket: $type")
                             }
@@ -242,6 +254,9 @@ object SkyplusClient : ClientModInitializer {
         ImHighUp()
         MobCps()
         IslandMembers()
+        ChaoticZoneEnter()
+        NearFixer()
+        CooldownManager()
 //        CooldownHud()
 //        WhatAdventure()
 

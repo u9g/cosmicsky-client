@@ -20,6 +20,7 @@ object Settings {
     var singleEscapeClosesChat: Boolean = true
     var shouldHidePOINotification: Boolean = true
     var redirectChatAToChatAlly: Boolean = true
+    var teamMembers: List<String> = listOf()
     var enableMod: Boolean = false
 
     fun start() {
