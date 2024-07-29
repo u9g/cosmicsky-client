@@ -35,7 +35,7 @@ public abstract class ChatScreenMixin extends Screen {
     private void skyplus$sendMessage(String chatText, CallbackInfoReturnable<String> cir) {
         if (Settings.INSTANCE.getEnableMod()) {
             if (Settings.INSTANCE.getReplaceFixToFixAll() &&
-                    chatText.toLowerCase(Locale.ROOT).startsWith("/fix")) {
+                    chatText.toLowerCase(Locale.ROOT).startsWith("/fix") && !chatText.equals("/fixstuckpingonmyscreen")) {
                 cir.setReturnValue("/fix all");
             } else if (Settings.INSTANCE.getTAlias() && chatText.toLowerCase(Locale.ROOT).equals("/t")) {
                 cir.setReturnValue("/is tp Momica");
