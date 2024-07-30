@@ -1,133 +1,193 @@
 package dev.u9g.features
 
+import dev.u9g.commands.thenExecute
 import dev.u9g.events.ChatMessageReceivedCallback
+import dev.u9g.events.CommandCallback
+import dev.u9g.mc
+import dev.u9g.util.ScreenUtil
+import io.wispforest.owo.ui.base.BaseOwoScreen
 import io.wispforest.owo.ui.component.Components
+import io.wispforest.owo.ui.component.DiscreteSliderComponent
 import io.wispforest.owo.ui.container.Containers
-import io.wispforest.owo.ui.core.*
-import io.wispforest.owo.ui.hud.Hud
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import io.wispforest.owo.ui.container.FlowLayout
+import io.wispforest.owo.ui.core.OwoUIAdapter
+import io.wispforest.owo.ui.core.Sizing
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
-import net.minecraft.text.Text
-import net.minecraft.util.Identifier
 import java.util.concurrent.TimeUnit
 
-class Cooldown(
-    val cooldownID: String,
-    cooldownInSeconds: Int,
-    val text: String,
-    val icon: ItemStack,
-    val color: String
-) {
-    val cooldownTime: Long = System.currentTimeMillis() + (cooldownInSeconds * 1000)
+fun formatTime(seconds: Long): String {
+    val minutes = TimeUnit.SECONDS.toMinutes(seconds)
+    val remainingSeconds = seconds - TimeUnit.MINUTES.toSeconds(minutes)
+    val stringBuilder: StringBuilder = StringBuilder()
+
+    if (minutes > 0) stringBuilder.append(minutes.toString() + "m")
+    if (seconds > 0) {
+        if (stringBuilder.toString().isNotBlank()) stringBuilder.append(" ");
+        stringBuilder.append(remainingSeconds.toString() + "s")
+    }
+
+    return stringBuilder.toString()
 }
 
-class CooldownManager {
+class Cooldown(val cooldownInSeconds: Int, val icon: ItemStack, val command: String, val colorString: String) {
+    var timeSinceLastUsed = System.currentTimeMillis() - (120 * 1000) //0L
+
+    fun color() = "§" + this.colorString
+
+    fun timeStr() =
+        formatTime(this.cooldownInSeconds - (System.currentTimeMillis() - this.timeSinceLastUsed) / 1000)
+}
+
+
+object CooldownManager {
+    private val cooldowns = mapOf(
+        "heal" to Cooldown(300, ItemStack(Items.GLISTERING_MELON_SLICE), "/heal", "e"),
+        "eat" to Cooldown(300, ItemStack(Items.COOKED_BEEF), "/eat", "a"),
+        "fix" to Cooldown(300, ItemStack(Items.ANVIL), "/fix", "b"),
+        "near" to Cooldown(300, ItemStack(Items.COMPASS), "/near", "c")
+    )
+
+    var middleXPercent: Double = 50.0
+    var middleYPercent: Double = 50.0
+
     init {
-        ClientTickEvents.END_CLIENT_TICK.register {
-            Hud.remove(Identifier("skyplus", "cooldown-hud"))
+        CommandCallback.event.register {
+            it.register("movehud") {
+                thenExecute {
+                    ScreenUtil.setScreenLater(MoveHudOnScreen())
+                }
+            }
+        }
 
-            val gl = Containers.grid(Sizing.content(), Sizing.content(), 3, cooldownMap.size)
 
-            for (cooldown in cooldownMap.iterator().withIndex()) {
-                gl.child(
-                    Components.item(cooldown.value.value.icon).margins(Insets.of(2)),
-                    0,
-                    cooldown.index
-                )
-
-                gl.child(
-                    Components.label(Text.of(cooldown.value.value.color + cooldown.value.value.text))
-                        .margins(Insets.of(2)),
-                    1,
-                    cooldown.index
-                )
-
-                gl.child(
-                    Components.label(Text.of(cooldown.value.value.color + formatTime(getTimeRemaining(cooldown.value.value))))
-                        .margins(Insets.of(2)),
-                    2,
-                    cooldown.index
+        HudRenderCallback.EVENT.register { a, b ->
+            fun drawItemCentered(stack: ItemStack, centerX: Int, centerY: Int) {
+                a.drawItem(
+                    stack,
+                    centerX - 8,
+                    centerY - 8
                 )
             }
 
-            Hud.add(Identifier("skyplus", "cooldown-hud")) {
-                gl
-                    .horizontalAlignment(HorizontalAlignment.CENTER)
-                    .surface(Surface.VANILLA_TRANSLUCENT)
-                    .positioning(Positioning.relative(50, 10))
+            fun drawTextCentered(msg: String, centerX: Int, centerY: Int) {
+                a.drawText(
+                    mc.textRenderer,
+                    msg,
+                    (centerX - (mc.textRenderer.getWidth(msg).toFloat() * 0.5)).toInt(),
+                    (centerY - 3.5).toInt(),
+                    -1,
+                    true
+                )
             }
 
-            val toRemove = mutableMapOf<String, Cooldown>()
+            a.matrices.push()
 
-            cooldownMap.forEach { (id, cooldown) ->
-                if (cooldown.cooldownTime <= System.currentTimeMillis()) toRemove[id] = cooldown
+            var centerX = (mc.window.scaledWidth.toFloat() * (middleXPercent / 100)).toInt()
+            val centerY = (mc.window.scaledHeight.toFloat() * (middleYPercent / 100)).toInt()
+
+            var first: Int? = null
+            var largest = 0
+            var i = 0
+
+            for (cooldown in cooldowns) {
+                val str = cooldown.value.timeStr()
+
+                val r0 = mc.textRenderer.getWidth(cooldown.value.command)
+
+                val r = mc.textRenderer.getWidth(str)
+
+
+                val curr = if (r0 > r) {
+                    r0
+                } else {
+                    r + 3 // 3px padding after text length
+                }
+
+                largest = largest.coerceAtLeast(curr)
+                i++
+
+                if (first == null) {
+                    first = curr
+                }
             }
 
-            toRemove.forEach { (id, _) ->
-                cooldownMap.remove(id)
+            if (first != null) {
+                centerX += (first / 2)
             }
+
+            centerX -= (largest * i) / 2
+
+            for (cooldown in cooldowns) {
+                drawItemCentered(cooldown.value.icon, centerX, centerY)
+
+                drawTextCentered(
+                    cooldown.value.color() + cooldown.value.command,
+                    centerX,
+                    centerY + 16
+                )
+
+                drawTextCentered(
+                    cooldown.value.color() + cooldown.value.timeStr(),
+                    centerX,
+                    centerY + 16 + 11
+                )
+
+                centerX += largest
+            }
+
+            a.matrices.pop()
         }
 
         listenToChatEvent()
     }
 
-    private fun getCooldownChildren(): List<Component> {
-        val cooldowns = mutableListOf<Component>()
-
-        cooldownMap.forEach { (_, cooldown) ->
-            Containers.verticalFlow(Sizing.content(), Sizing.content())
-                .child(Components.item(cooldown.icon))
-                .child(Components.label(Text.of(cooldown.color + cooldown.text)))
-                .child(Components.label(Text.of(cooldown.color + formatTime(getTimeRemaining(cooldown)))))
-                .verticalAlignment(VerticalAlignment.CENTER)
-                .horizontalAlignment(HorizontalAlignment.CENTER)
-                .margins(Insets.of(3))
-                .also { cooldowns.add(it) }
-        }
-
-        return cooldowns
-    }
-
-    private fun getTimeRemaining(cooldown: Cooldown): Long {
-        return (cooldown.cooldownTime - System.currentTimeMillis()) / 1000
-    }
-
-    fun formatTime(seconds: Long): String {
-        val minutes = TimeUnit.SECONDS.toMinutes(seconds)
-        val remainingSeconds = seconds - TimeUnit.MINUTES.toSeconds(minutes)
-        val stringBuilder: StringBuilder = StringBuilder()
-
-        if (minutes > 0) stringBuilder.append(minutes.toString() + "m")
-        if (seconds > 0) {
-            if (stringBuilder.toString().isNotBlank()) stringBuilder.append(" ");
-            stringBuilder.append(remainingSeconds.toString() + "s")
-        }
-
-        return stringBuilder.toString()
-    }
-
     private fun listenToChatEvent() {
         ChatMessageReceivedCallback.event.register { event ->
             when (event.msg) {
-                "(!) Healed" -> cooldownMap["heal"] =
-                    Cooldown("heal", 300, "/heal", ItemStack(Items.GLISTERING_MELON_SLICE), "§c")
+                "(!) Healed" -> {
+                    cooldowns["heal"]?.timeSinceLastUsed = System.currentTimeMillis()
+                }
 
-                "Appetite has been satiated." -> cooldownMap["eat"] =
-                    Cooldown("eat", 300, "/eat", ItemStack(Items.COOKED_BEEF), "§e")
+                "Appetite has been satiated." -> {
+                    cooldowns["eat"]?.timeSinceLastUsed = System.currentTimeMillis()
+                }
             }
 
             if (event.msg.startsWith("(!) Repaired:")) {
-                cooldownMap["fix"] = Cooldown("fix", 120, "/fix", ItemStack(Items.ANVIL), "§f")
+                cooldowns["fix"]?.timeSinceLastUsed = System.currentTimeMillis()
             }
 
             if (event.msg.startsWith("Nearby Players") || event.msg.startsWith("(!) There is no one nearby")) {
-                cooldownMap["near"] = Cooldown("near", 120, "/near", ItemStack(Items.COMPASS), "§b")
+                cooldowns["near"]?.timeSinceLastUsed = System.currentTimeMillis()
             }
         }
     }
+}
 
-    companion object {
-        private val cooldownMap: MutableMap<String, Cooldown> = mutableMapOf()
+class MoveHudOnScreen : BaseOwoScreen<FlowLayout>() {
+    override fun build(rootComponent: FlowLayout) {
+        rootComponent.childById(DiscreteSliderComponent::class.java, "x").onChanged().subscribe {
+            CooldownManager.middleXPercent = it
+        }
+        rootComponent.childById(DiscreteSliderComponent::class.java, "y").onChanged().subscribe {
+            CooldownManager.middleYPercent = it
+        }
+    }
+
+    override fun createAdapter(): OwoUIAdapter<FlowLayout> {
+        return OwoUIAdapter.create(
+            this
+        ) { a, b ->
+            Containers.verticalFlow(a, b).children(
+                listOf(
+                    Components.discreteSlider(Sizing.fill(50), 0.0, 100.0).value(CooldownManager.middleXPercent / 100)
+                        .id("x"),
+                    Components.discreteSlider(Sizing.fill(50), 0.0, 100.0).value(CooldownManager.middleYPercent / 100)
+                        .id("y")
+                )
+            )
+        }
     }
 }
