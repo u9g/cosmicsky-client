@@ -1,0 +1,25 @@
+<owo-ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/wisp-forest/owo-lib/0.8/owo-ui.xsd">
+    <components>
+        <flow-layout direction="vertical">
+            <children>
+                <label>
+                    <text>X</text>
+                    <shadow>true</shadow>
+                </label>
+                <discrete-slider min="0" max="100" id="x">
+                </discrete-slider>
+
+                <label>
+                    <text>Y</text>
+                    <shadow>true</shadow>
+                </label>
+                <discrete-slider min="0" max="100" id="y">
+                </discrete-slider>
+            </children>
+            <horizontal-alignment>center</horizontal-alignment>
+            <vertical-alignment>center</vertical-alignment>
+        </flow-layout>
+
+    </components>
+</owo-ui>
