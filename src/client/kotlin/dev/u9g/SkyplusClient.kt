@@ -264,10 +264,11 @@ object SkyplusClient : ClientModInitializer {
         ImHighUp()
         MobCps()
         IslandMembers()
-        ChaoticZoneEnter()
+//        ChaoticZoneEnter()
         NearFixer()
-        CooldownManager()
+        CooldownManager
         HidePOINotification()
+        PetCooldowns
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
             CommandCallback.event.invoker().invoke(CommandEvent(dispatcher, ctx, mc.networkHandler?.commandDispatcher))
