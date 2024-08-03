@@ -258,7 +258,7 @@ object SkyplusClient : ClientModInitializer {
         Calculator
         Coroutines
         Teams
-        Settings.start()
+        Settings
         AreaFishedOut
         TPOutAnnouncer
         ImHighUp

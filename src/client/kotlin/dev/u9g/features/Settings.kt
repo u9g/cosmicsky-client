@@ -23,7 +23,7 @@ object Settings {
     var teamMembers: List<String> = listOf()
     var enableMod: Boolean = false
 
-    fun start() {
+    init {
         CommandCallback.event.register {
             it.register("skyplussettings") {
                 thenExecute {
