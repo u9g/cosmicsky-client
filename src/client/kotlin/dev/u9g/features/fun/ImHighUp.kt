@@ -8,7 +8,7 @@ import dev.u9g.mc
 import java.text.DecimalFormat
 import kotlin.math.ceil
 
-class ImHighUp {
+object ImHighUp {
     private val regex = "ImHighUp's Balance: \\$([\\d,.]+)".toRegex()
     private val addCommas = DecimalFormat("#,###")
 

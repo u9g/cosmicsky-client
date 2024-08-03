@@ -11,7 +11,7 @@ import net.minecraft.client.item.TooltipContext
 import net.minecraft.inventory.SimpleInventory
 import java.util.concurrent.TimeUnit
 
-class IslandMembers {
+object IslandMembers {
     private var screen: Screen? = null
     private var ticks = 0
 
@@ -50,7 +50,6 @@ class IslandMembers {
                             MinecraftClient.getInstance().submit {
                                 MinecraftClient.getInstance().setScreen(IslandInfoScreen(it))
                             }
-//                            IslandInfoScreen. = IslandInfoScreen(it)
                         }
                     }
                 }

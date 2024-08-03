@@ -254,21 +254,22 @@ object SkyplusClient : ClientModInitializer {
             }
 
         }
-        Waypoints()
-        Calculator()
-        Coroutines()
-        Teams()
+        Waypoints
+        Calculator
+        Coroutines
+        Teams
         Settings.start()
-        AreaFishedOut()
-        TPOutAnnouncer()
-        ImHighUp()
-        MobCps()
-        IslandMembers()
-//        ChaoticZoneEnter()
-        NearFixer()
+        AreaFishedOut
+        TPOutAnnouncer
+        ImHighUp
+        MobCps
+        IslandMembers
+        NearFixer
         CooldownManager
-        HidePOINotification()
+        HidePOINotification
         PetCooldowns
+        ClueScrollManager
+        ChaoticZoneEnter
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
             CommandCallback.event.invoker().invoke(CommandEvent(dispatcher, ctx, mc.networkHandler?.commandDispatcher))

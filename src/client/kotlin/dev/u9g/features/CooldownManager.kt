@@ -4,18 +4,20 @@ import dev.u9g.commands.thenExecute
 import dev.u9g.events.ChatMessageReceivedCallback
 import dev.u9g.events.CommandCallback
 import dev.u9g.mc
+import dev.u9g.util.MoveHudOnScreen
 import dev.u9g.util.ScreenUtil
-import io.wispforest.owo.ui.base.BaseOwoScreen
-import io.wispforest.owo.ui.component.Components
-import io.wispforest.owo.ui.component.DiscreteSliderComponent
-import io.wispforest.owo.ui.container.Containers
-import io.wispforest.owo.ui.container.FlowLayout
-import io.wispforest.owo.ui.core.OwoUIAdapter
-import io.wispforest.owo.ui.core.Sizing
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
+import net.minecraft.client.MinecraftClient
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
+import java.io.File
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
+import kotlin.io.path.readText
+import kotlin.io.path.writeText
 
 fun formatTime(seconds: Long): String {
     val minutes = TimeUnit.SECONDS.toMinutes(seconds)
@@ -31,117 +33,203 @@ fun formatTime(seconds: Long): String {
     return stringBuilder.toString()
 }
 
-class Cooldown(val cooldownInSeconds: Int, val icon: ItemStack, val command: String, val colorString: String) {
-    var timeSinceLastUsed = System.currentTimeMillis() - (120 * 1000) //0L
+class Cooldown(
+    private val cooldownInSeconds: Int,
+    val icon: ItemStack,
+    val command: String,
+    private val colorString: String
+) {
+    var timeSinceLastUsed = 0L
 
     fun color() = "§" + this.colorString
 
-    fun timeStr() =
-        formatTime(this.cooldownInSeconds - (System.currentTimeMillis() - this.timeSinceLastUsed) / 1000)
+    fun timeStr(): String {
+        val timeSinceLastUsed = if (MinecraftClient.getInstance().currentScreen is MoveHudOnScreen) {
+            System.currentTimeMillis() - (this.cooldownInSeconds * 1000) / 2
+        } else {
+            this.timeSinceLastUsed
+        }
+
+        return formatTime(this.cooldownInSeconds - (System.currentTimeMillis() - timeSinceLastUsed) / 1000)
+    }
 }
 
+@Serializable
+data class CooldownSettings(
+    var middleXPercent: Double = 50.0,
+    var middleYPercent: Double = 50.0,
+    var isBackgroundOn: Boolean = true,
+    var isEnabled: Boolean = true
+)
+
+val SETTINGS_FILE_PATH: Path = File("cooldown_hud_settings.json").toPath()
 
 object CooldownManager {
     private val cooldowns = mapOf(
         "heal" to Cooldown(300, ItemStack(Items.GLISTERING_MELON_SLICE), "/heal", "e"),
         "eat" to Cooldown(300, ItemStack(Items.COOKED_BEEF), "/eat", "a"),
         "fix" to Cooldown(300, ItemStack(Items.ANVIL), "/fix", "b"),
-        "near" to Cooldown(300, ItemStack(Items.COMPASS), "/near", "c")
+        "near" to Cooldown(300, ItemStack(Items.COMPASS), "/near", "c"),
+        "bleed" to Cooldown(3 * 60, ItemStack(Items.GOLDEN_SWORD), "Bleed", "f")
     )
 
-    var middleXPercent: Double = 50.0
-    var middleYPercent: Double = 50.0
+    var settings: CooldownSettings
+
+    private fun serializeSettings() {
+        try {
+            SETTINGS_FILE_PATH.writeText(Json.encodeToString(settings))
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun setMiddleXPercent(x: Double) {
+        settings.middleXPercent = x
+
+        serializeSettings()
+    }
+
+    private fun setMiddleYPercent(y: Double) {
+        settings.middleYPercent = y
+
+        serializeSettings()
+    }
+
+    fun setIsBackgroundOn(isBackgroundOn: Boolean) {
+        settings.isBackgroundOn = isBackgroundOn
+
+        serializeSettings()
+    }
+
+    private fun setIsEnabled(isEnabled: Boolean) {
+        settings.isEnabled = isEnabled
+
+        serializeSettings()
+    }
 
     init {
+        try {
+            settings = Json.decodeFromString(SETTINGS_FILE_PATH.readText())
+        } catch (e: Exception) {
+            e.printStackTrace()
+            settings = CooldownSettings()
+        }
+
         CommandCallback.event.register {
-            it.register("movehud") {
+            it.register("cooldownhud") {
                 thenExecute {
-                    ScreenUtil.setScreenLater(MoveHudOnScreen())
+                    ScreenUtil.setScreenLater(
+                        MoveHudOnScreen(
+                            ::setMiddleXPercent,
+                            ::setMiddleYPercent,
+                            ::setIsEnabled
+                        )
+                    )
                 }
             }
         }
 
-
-        HudRenderCallback.EVENT.register { a, b ->
-            fun drawItemCentered(stack: ItemStack, centerX: Int, centerY: Int) {
-                a.drawItem(
-                    stack,
-                    centerX - 8,
-                    centerY - 8
-                )
-            }
-
-            fun drawTextCentered(msg: String, centerX: Int, centerY: Int) {
-                a.drawText(
-                    mc.textRenderer,
-                    msg,
-                    (centerX - (mc.textRenderer.getWidth(msg).toFloat() * 0.5)).toInt(),
-                    (centerY - 3.5).toInt(),
-                    -1,
-                    true
-                )
-            }
-
-            a.matrices.push()
-
-            var centerX = (mc.window.scaledWidth.toFloat() * (middleXPercent / 100)).toInt()
-            val centerY = (mc.window.scaledHeight.toFloat() * (middleYPercent / 100)).toInt()
-
-            var first: Int? = null
-            var largest = 0
-            var i = 0
-
-            for (cooldown in cooldowns) {
-                val str = cooldown.value.timeStr()
-
-                val r0 = mc.textRenderer.getWidth(cooldown.value.command)
-
-                val r = mc.textRenderer.getWidth(str)
-
-
-                val curr = if (r0 > r) {
-                    r0
-                } else {
-                    r + 3 // 3px padding after text length
+        HudRenderCallback.EVENT.register { drawCtx, _ ->
+            if (settings.isEnabled && Settings.enableMod) {
+                fun drawItemCentered(stack: ItemStack, centerX: Int, centerY: Int) {
+                    drawCtx.drawItem(
+                        stack,
+                        centerX - 8,
+                        centerY - 8
+                    )
                 }
 
-                largest = largest.coerceAtLeast(curr)
-                i++
-
-                if (first == null) {
-                    first = curr
+                fun drawTextCentered(msg: String, centerX: Int, centerY: Int) {
+                    drawCtx.drawText(
+                        mc.textRenderer,
+                        msg,
+                        (centerX - (mc.textRenderer.getWidth(msg).toFloat() * 0.5)).toInt(),
+                        (centerY - 3.5).toInt(),
+                        -1,
+                        true
+                    )
                 }
+
+                drawCtx.matrices.push()
+
+                var centerX = (mc.window.scaledWidth.toFloat() * (settings.middleXPercent / 100)).toInt()
+                val centerY = (mc.window.scaledHeight.toFloat() * (settings.middleYPercent / 100)).toInt()
+
+                var first: Int? = null
+                var largest = 0
+                var i = 0
+
+                for (cooldown in cooldowns) {
+                    if (cooldown.value.timeStr() != "") {
+                        val str = cooldown.value.timeStr()
+
+                        val r0 = mc.textRenderer.getWidth(cooldown.value.command)
+
+                        val r = mc.textRenderer.getWidth(str)
+
+
+                        val curr = if (r0 > r) {
+                            r0 + 4
+                        } else {
+                            r + 3 // 3px padding after text length
+                        }
+
+                        largest = largest.coerceAtLeast(curr)
+                        i++
+
+                        if (first == null) {
+                            first = curr
+                        }
+                    }
+                }
+
+                if (first != null) {
+                    centerX += (first / 2)
+                }
+
+                centerX -= (largest * i) / 2
+
+                val padding = 3
+
+                if (settings.isBackgroundOn && i > 0) {
+                    drawCtx.fill(
+                        (centerX - largest / 2) - padding,
+                        (centerY - 8) - padding,
+                        ((centerX - largest / 2) + (largest * i) - 6) + padding * 2,
+                        ((centerY - 8) + 16 + 11 + 11 + 2) + padding * 2,
+                        -1072689136
+                    )
+                }
+                for (cooldown in cooldowns) {
+                    if (cooldown.value.timeStr() != "") {
+
+                        drawItemCentered(cooldown.value.icon, centerX, centerY)
+
+                        drawTextCentered(
+                            cooldown.value.color() + cooldown.value.command,
+                            centerX,
+                            centerY + 16
+                        )
+
+                        drawTextCentered(
+                            cooldown.value.color() + cooldown.value.timeStr(),
+                            centerX,
+                            centerY + 16 + 11
+                        )
+
+
+                        centerX += largest
+                    }
+                }
+
+                drawCtx.matrices.pop()
             }
-
-            if (first != null) {
-                centerX += (first / 2)
-            }
-
-            centerX -= (largest * i) / 2
-
-            for (cooldown in cooldowns) {
-                drawItemCentered(cooldown.value.icon, centerX, centerY)
-
-                drawTextCentered(
-                    cooldown.value.color() + cooldown.value.command,
-                    centerX,
-                    centerY + 16
-                )
-
-                drawTextCentered(
-                    cooldown.value.color() + cooldown.value.timeStr(),
-                    centerX,
-                    centerY + 16 + 11
-                )
-
-                centerX += largest
-            }
-
-            a.matrices.pop()
         }
 
         listenToChatEvent()
     }
+
+    private val BLEED_REGEX = "\\*\\* ENEMY BLEEDING \\([a-zA-Z0-9_]+\\) \\*\\*".toRegex()
 
     private fun listenToChatEvent() {
         ChatMessageReceivedCallback.event.register { event ->
@@ -155,6 +243,10 @@ object CooldownManager {
                 }
             }
 
+            if (BLEED_REGEX.matches(event.msg)) {
+                cooldowns["bleed"]?.timeSinceLastUsed = System.currentTimeMillis()
+            }
+
             if (event.msg.startsWith("(!) Repaired:")) {
                 cooldowns["fix"]?.timeSinceLastUsed = System.currentTimeMillis()
             }
@@ -166,28 +258,3 @@ object CooldownManager {
     }
 }
 
-class MoveHudOnScreen : BaseOwoScreen<FlowLayout>() {
-    override fun build(rootComponent: FlowLayout) {
-        rootComponent.childById(DiscreteSliderComponent::class.java, "x").onChanged().subscribe {
-            CooldownManager.middleXPercent = it
-        }
-        rootComponent.childById(DiscreteSliderComponent::class.java, "y").onChanged().subscribe {
-            CooldownManager.middleYPercent = it
-        }
-    }
-
-    override fun createAdapter(): OwoUIAdapter<FlowLayout> {
-        return OwoUIAdapter.create(
-            this
-        ) { a, b ->
-            Containers.verticalFlow(a, b).children(
-                listOf(
-                    Components.discreteSlider(Sizing.fill(50), 0.0, 100.0).value(CooldownManager.middleXPercent / 100)
-                        .id("x"),
-                    Components.discreteSlider(Sizing.fill(50), 0.0, 100.0).value(CooldownManager.middleYPercent / 100)
-                        .id("y")
-                )
-            )
-        }
-    }
-}

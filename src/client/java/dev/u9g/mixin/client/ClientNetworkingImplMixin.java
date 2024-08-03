@@ -13,6 +13,4 @@ public class ClientNetworkingImplMixin {
         // This code is injected into the start of Minecraft.run()V
         info.cancel();
     }
-
-
 }

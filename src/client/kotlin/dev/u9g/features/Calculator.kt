@@ -13,7 +13,7 @@ import java.util.*
 
 const val calculationPrecision = 5
 
-class Calculator {
+object Calculator {
     init {
         CommandCallback.event.register {
             it.register("calc") {

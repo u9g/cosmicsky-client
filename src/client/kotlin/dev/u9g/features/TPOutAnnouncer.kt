@@ -14,7 +14,7 @@ var uuid2tpOut: Map<String, TPOut> = mapOf()
 
 data class TPOut(val secLeft: String, val at: Long = System.currentTimeMillis())
 
-class TPOutAnnouncer {
+object TPOutAnnouncer {
     private val regex = "\\(!\\) You will be shuttled from this Adventure in (\\d+)s...".toRegex()
 
     init {
@@ -45,7 +45,7 @@ class TPOutAnnouncer {
                             world.players.find { it.uuidAsString == uuid }?.let {
                                 val d = it.distanceTo(player)
                                 if (player != it && d < 20) {
-                                    withFacingThePlayer(it.pos.offset(Direction.UP, 2.8)) {
+                                    withFacingThePlayer(it.getLerpedPos(event.tickDelta).offset(Direction.UP, 2.8)) {
                                         text(Text.of("§e" + tpOut.secLeft + "s"))
                                     }
                                 }

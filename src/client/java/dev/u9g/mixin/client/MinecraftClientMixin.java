@@ -31,6 +31,7 @@ public class MinecraftClientMixin {
         if (Settings.INSTANCE.getEnableMod() && Settings.INSTANCE.getDisableSwingingAtLowDurability() && item.getMaxDamage() - item.getDamage() < 10 && item.getItem().isDamageable()) {
             cir.setReturnValue(false);
             this.player.sendMessage(Text.of("§c§l(!) §cYou cannot hit anymore! Item durability is below 10! §eYou can toggle this in /skyplussettings"));
+            MinecraftClient.getInstance().getNetworkHandler().sendChatCommand("fix");
         }
     }
 

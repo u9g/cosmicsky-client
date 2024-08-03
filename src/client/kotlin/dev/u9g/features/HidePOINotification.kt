@@ -6,7 +6,7 @@ import dev.u9g.events.TitleTextCallback
 import net.minecraft.text.MutableText
 import net.minecraft.text.PlainTextContent.Literal
 
-class HidePOINotification {
+object HidePOINotification {
     init {
         //§a§lGusty Grove
         TitleTextCallback.event.register {

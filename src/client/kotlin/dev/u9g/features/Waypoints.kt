@@ -30,7 +30,7 @@ const val TIME_TO_WAIT_BEFORE_TARGETED_PING = 200
 var lastTickDelta: Float = 0.0F
 var lastDeathPing = System.currentTimeMillis()
 
-class Waypoints {
+object Waypoints {
     private val pingKey = KeyBinding("Ping!", InputUtil.GLFW_KEY_F, "Pings")
     private val focusPingKey = KeyBinding("Focus Ping!", InputUtil.GLFW_KEY_X, "Pings")
     private var startedPingingTime: Long = 0L

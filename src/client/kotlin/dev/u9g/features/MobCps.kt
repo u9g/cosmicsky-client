@@ -7,7 +7,7 @@ import dev.u9g.util.getScoreboardLines
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.minecraft.client.MinecraftClient
 
-class MobCps {
+object MobCps {
     private val rollingAverage = RollingAverage()
 
     init {

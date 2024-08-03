@@ -12,7 +12,7 @@ val globalJob = Job()
 val coroutineScope =
     CoroutineScope(EmptyCoroutineContext + CoroutineName("Firmament")) + SupervisorJob(globalJob)
 
-class Coroutines {
+object Coroutines {
     init {
         ClientLifecycleEvents.CLIENT_STOPPING.register(ClientLifecycleEvents.ClientStopping {
             println("Shutting down coroutines")

@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents
 import net.minecraft.client.MinecraftClient
 import net.minecraft.text.Text
 
-class NearFixer {
+object NearFixer {
     private var lastNear = 0L
 
     val nearRegex = "(?:Nearby Players \\(\\d+\\): )?(.+) \\((\\d+m)\\)".toRegex()

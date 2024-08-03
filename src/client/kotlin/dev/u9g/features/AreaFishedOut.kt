@@ -4,7 +4,7 @@ import dev.u9g.events.ChatMessageReceivedCallback
 import dev.u9g.playSound
 import net.minecraft.util.Identifier
 
-class AreaFishedOut {
+object AreaFishedOut {
     init {
         ChatMessageReceivedCallback.event.register {
             if (Settings.enableMod && it.msg == "(!) It seems this area has been fished out!") {

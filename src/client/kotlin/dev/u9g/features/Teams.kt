@@ -8,7 +8,7 @@ import dev.u9g.events.CommandCallback
 import dev.u9g.webSocket
 import net.minecraft.client.MinecraftClient
 
-class Teams {
+object Teams {
     init {
         CommandCallback.event.register {
             it.register("createteam") {
