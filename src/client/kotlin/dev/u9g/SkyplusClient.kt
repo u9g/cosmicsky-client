@@ -27,7 +27,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 
-lateinit var mc: MinecraftClient
+val mc: MinecraftClient get() = MinecraftClient.getInstance()
 var ex: ExecutorService = Executors.newSingleThreadExecutor()
 val webSocket = SkyPlusWebSocket(null)
 
@@ -242,18 +242,19 @@ object SkyplusClient : ClientModInitializer {
     override fun onInitializeClient() {
         println("SkyPlus-Client starting.")
         JavaMain.LOGGER.info("SkyPlus-Client starting. VIA LOGGER")
-        mc = MinecraftClient.getInstance()
+
         ServerConnectCallback.event.register {
             makeWebsocket()
         }
+
         CommandCallback.event.register {
             it.register("skyplusre") {
                 thenExecute {
                     makeWebsocket()
                 }
             }
-
         }
+
         Waypoints
         Calculator
         Coroutines
