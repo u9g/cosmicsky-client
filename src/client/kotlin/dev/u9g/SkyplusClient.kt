@@ -204,7 +204,7 @@ fun makeWebsocket() {
                                     "type" to "connected",
                                     "username" to MinecraftClient.getInstance().session.username,
                                     "uuid" to it.toString(),
-                                    "version" to "1.2.4"
+                                    "version" to "1.2.5"
                                 )
                             )
                         }
@@ -216,7 +216,7 @@ fun makeWebsocket() {
                         clientCloseFrame: WebSocketFrame?,
                         closedByServer: Boolean
                     ) {
-                        MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l(!) SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre"))
+                        MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l[!] SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre"))
                         super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
                     }
                 })
@@ -270,7 +270,8 @@ object SkyplusClient : ClientModInitializer {
         HidePOINotification
         PetCooldowns
         ClueScrollManager
-        ChaoticZoneEnter
+        MakeChaoticGreenForTeamMembers
+//        ChaoticZoneEnter
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
             CommandCallback.event.invoker().invoke(CommandEvent(dispatcher, ctx, mc.networkHandler?.commandDispatcher))
