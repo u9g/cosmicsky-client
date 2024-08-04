@@ -21,7 +21,7 @@ object MobCps {
 
         HudRenderCallback.EVENT.register { ctx, _ ->
             val avg = rollingAverage.getRollingAverage().toInt()
-            if (Settings.shouldShowMobsPerSecond && avg > 0 && getScoreboardLines().any {
+            if (Settings.enableMod && Settings.shouldShowMobsPerSecond && avg > 0 && getScoreboardLines().any {
                     it.string.startsWith("Island EXP (LVL ")
                 }) {
                 val toRender = "$avg mps"
