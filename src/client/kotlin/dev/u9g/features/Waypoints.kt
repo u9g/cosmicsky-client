@@ -9,7 +9,6 @@ import dev.u9g.mc
 import dev.u9g.util.FirmFormatters
 import dev.u9g.util.render.RenderInWorldContext
 import dev.u9g.util.worldName
-import dev.u9g.webSocket
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.minecraft.client.MinecraftClient
@@ -254,7 +253,7 @@ fun sendPing(pingType: String, isTargetedPing: Boolean) {
         true -> {
             val raycasted = MinecraftClient.getInstance().player!!.raycast(5000.0, lastTickDelta, false)
             if (raycasted.type == HitResult.Type.BLOCK) {
-                webSocket.sendText(
+                Websocket.sendText(
                     jsonObjectOf(
                         "type" to "ping",
                         "pingType" to pingType,
@@ -269,7 +268,7 @@ fun sendPing(pingType: String, isTargetedPing: Boolean) {
 
         false -> {
             val block = MinecraftClient.getInstance().player!!.blockPos
-            webSocket.sendText(
+            Websocket.sendText(
                 jsonObjectOf(
                     "type" to "ping",
                     "pingType" to pingType,

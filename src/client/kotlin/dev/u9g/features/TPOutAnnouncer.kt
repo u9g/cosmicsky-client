@@ -4,7 +4,6 @@ import dev.u9g.events.OverlayTextCallback
 import dev.u9g.events.WorldRenderLastCallback
 import dev.u9g.mc
 import dev.u9g.util.render.RenderInWorldContext
-import dev.u9g.webSocket
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.client.MinecraftClient
 import net.minecraft.text.Text
@@ -23,7 +22,7 @@ object TPOutAnnouncer {
             if (match != null) {
                 val (secLeft) = match.destructured
 
-                webSocket.sendText(
+                Websocket.sendText(
                     jsonObjectOf(
                         "type" to "tpTimer",
                         "tpType" to "outOfAdv",

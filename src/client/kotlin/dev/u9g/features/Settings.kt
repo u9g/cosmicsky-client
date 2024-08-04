@@ -27,7 +27,7 @@ object Settings {
         CommandCallback.event.register {
             it.register("skyplussettings") {
                 thenExecute {
-                    webSocket.sendText(
+                    Websocket.sendText(
                         jsonObjectOf(
                             "type" to "showSettings"
                         )
@@ -36,7 +36,7 @@ object Settings {
 
                 thenArgument("command", RestArgumentType) { cmd ->
                     thenExecute {
-                        webSocket.sendText(
+                        Websocket.sendText(
                             jsonObjectOf(
                                 "type" to "settingsCmd",
                                 "cmd" to this[cmd]
