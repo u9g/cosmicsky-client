@@ -21,11 +21,13 @@ object PetCooldowns {
 
     init {
         ItemStackCooldownProgressCallback.event.register {
-            it.item.nbt?.getString("petType")?.let { petType ->
-                knownCooldowns[petType]?.let { petCooldown ->
-                    val lastUsed = it.item.nbt?.getLong("lastUsed") ?: 0L
-                    val lastUsedMinutesAgo = (System.currentTimeMillis() - lastUsed) / 1000 / 60
-                    it.overrideProgress(1 - (lastUsedMinutesAgo.toFloat() / petCooldown).coerceAtMost(1f))
+            if (Settings.enableMod) {
+                it.item.nbt?.getString("petType")?.let { petType ->
+                    knownCooldowns[petType]?.let { petCooldown ->
+                        val lastUsed = it.item.nbt?.getLong("lastUsed") ?: 0L
+                        val lastUsedMinutesAgo = (System.currentTimeMillis() - lastUsed) / 1000 / 60
+                        it.overrideProgress(1 - (lastUsedMinutesAgo.toFloat() / petCooldown).coerceAtMost(1f))
+                    }
                 }
             }
         }
