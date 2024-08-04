@@ -8,7 +8,6 @@
     "ExampleClientMixin",
     "GenericContainerScreenMixin",
     "MinecraftClientMixin",
-    "PlayerEntityRendererMixin",
     "events.ClientPlayerEventInteractionManagerMixin",
     "events.ClientPlayNetworkHandlerMixin",
     "events.ConnectScreenMixin",
@@ -22,6 +21,7 @@
   "mixins": [
     "ItemMixin",
     "ItemStackMixin",
+    "TeamMixin",
     "VanillaResourcePackProviderMixin",
     "events.LivingEntityMixin"
   ]
