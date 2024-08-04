@@ -12,12 +12,12 @@ object NearFixer {
 
     init {
         ClientSendMessageEvents.COMMAND.register {
-            if (it.startsWith("near")) {
+            if (Settings.enableMod && it.startsWith("near")) {
                 lastNear = System.currentTimeMillis()
             }
         }
         ChatMessageReceivedCallback.event.register {
-            if (System.currentTimeMillis() - lastNear < 1000) {
+            if (Settings.enableMod && System.currentTimeMillis() - lastNear < 1000) {
                 for (match in nearRegex.findAll(it.msg.replace("§.".toRegex(), ""))) {
                     val (_, a, b) = match.groupValues
 
