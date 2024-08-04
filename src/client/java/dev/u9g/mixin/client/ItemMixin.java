@@ -3,6 +3,7 @@ package dev.u9g.mixin.client;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import dev.u9g.features.ClueScrollManager;
+import dev.u9g.features.Settings;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ItemMixin {
     @Inject(at = @At("HEAD"), method = "isItemBarVisible", cancellable = true)
     private void skyplus$isItemBarVisible(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+        if (!Settings.INSTANCE.getEnableMod()) return;
         try {
             var clueScrollInfo = ClueScrollManager.INSTANCE.getClueScrollInfo(stack);
             if (clueScrollInfo != null) {
@@ -28,6 +30,7 @@ public class ItemMixin {
 
     @Inject(at = @At("HEAD"), method = "getItemBarStep", cancellable = true)
     private void skyplus$getItemBarStep(ItemStack stack, CallbackInfoReturnable<Integer> cir) {
+        if (!Settings.INSTANCE.getEnableMod()) return;
         try {
             var clueScrollInfo = ClueScrollManager.INSTANCE.getClueScrollInfo(stack);
             if (clueScrollInfo != null) {
@@ -43,6 +46,7 @@ public class ItemMixin {
 
     @ModifyExpressionValue(at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F"), method = "getItemBarColor")
     private float skyplus$getItemBarColor(float original, @Local(argsOnly = true) ItemStack stack) {
+        if (!Settings.INSTANCE.getEnableMod()) return original;
         try {
             var clueScrollInfo = ClueScrollManager.INSTANCE.getClueScrollInfo(stack);
             if (clueScrollInfo != null) {
