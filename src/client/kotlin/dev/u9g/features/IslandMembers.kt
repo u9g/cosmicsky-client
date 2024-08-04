@@ -22,6 +22,8 @@ object IslandMembers {
         }
 
         ClientTickEvents.END_CLIENT_TICK.register {
+            if (!Settings.enableMod) return@register
+
             val currentScreen = MinecraftClient.getInstance().currentScreen
             if (currentScreen == screen) {
                 ticks++
