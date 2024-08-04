@@ -5,6 +5,7 @@
   "client": [
     "ChatScreenMixin",
     "ClientNetworkingImplMixin",
+    "DrawContextMixin",
     "ExampleClientMixin",
     "GenericContainerScreenMixin",
     "MinecraftClientMixin",
