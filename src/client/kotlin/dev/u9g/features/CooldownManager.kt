@@ -68,8 +68,8 @@ object CooldownManager {
     private val cooldowns = mapOf(
         "heal" to Cooldown(300, ItemStack(Items.GLISTERING_MELON_SLICE), "/heal", "e"),
         "eat" to Cooldown(300, ItemStack(Items.COOKED_BEEF), "/eat", "a"),
-        "fix" to Cooldown(300, ItemStack(Items.ANVIL), "/fix", "b"),
-        "near" to Cooldown(300, ItemStack(Items.COMPASS), "/near", "c"),
+        "fix" to Cooldown(2 * 60, ItemStack(Items.ANVIL), "/fix", "b"),
+        "near" to Cooldown(30, ItemStack(Items.COMPASS), "/near", "c"),
         "bleed" to Cooldown(3 * 60, ItemStack(Items.GOLDEN_SWORD), "Bleed", "f")
     )
 
@@ -229,7 +229,7 @@ object CooldownManager {
         listenToChatEvent()
     }
 
-    private val BLEED_REGEX = "\\*\\* ENEMY BLEEDING \\([a-zA-Z0-9_]+\\) \\*\\*".toRegex()
+    private val BLEED_REGEX = "^\\*\\* ENEMY BLEEDING \\(.+\\) \\*\\*$".toRegex()
 
     private fun listenToChatEvent() {
         ChatMessageReceivedCallback.event.register { event ->
