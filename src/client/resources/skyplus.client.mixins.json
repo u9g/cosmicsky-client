@@ -12,10 +12,10 @@
     "SocialInteractionsPlayerListEntryMixin",
     "SocialInteractionsPlayerListWidgetMixin",
     "events.ClientPlayerEventInteractionManagerMixin",
-    "events.ClientPlayNetworkHandlerMixin",
     "events.ConnectScreenMixin",
     "events.DrawContextMixin",
     "events.InGameHudMixin",
+    "events.MessageHandlerMixin",
     "events.WorldRenderLastEventPatch"
   ],
   "injectors": {
@@ -26,6 +26,7 @@
     "ItemStackMixin",
     "TeamMixin",
     "VanillaResourcePackProviderMixin",
-    "events.LivingEntityMixin"
+    "events.LivingEntityMixin",
+    "events.WorldMixin"
   ]
 }
