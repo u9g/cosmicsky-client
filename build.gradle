@@ -22,6 +22,13 @@ repositories {
     maven { url = "https://maven.shedaniel.me" }
     maven { url = "https://repo.nea.moe/releases" }
     maven { url "https://repo.nea.moe/releases/" }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
 //    maven { url "https://maven.wispforest.io/" }
 }
 
@@ -59,6 +66,11 @@ dependencies {
     modImplementation("moe.nea.jarvis:jarvis-api:1.0.1")
     include("moe.nea.jarvis:jarvis-fabric:1.0.1")
     modLocalRuntime("moe.nea.jarvis:jarvis-fabric:1.0.1")
+
+    // Add the base CIT Resewn API to the project
+    modCompileOnly "maven.modrinth:cit-resewn:1.1.2+1.19.2"
+    // Add Defaults to the project
+    modCompileOnly "maven.modrinth:cit-resewn-defaults:1.1.2+1.19.2"
 
     // Actual dependencies
 //    modCompileOnly('me.shedaniel:RoughlyEnoughItems-api-fabric:14.1.727') {

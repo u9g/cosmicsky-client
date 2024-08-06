@@ -17,6 +17,9 @@
   "entrypoints": {
     "main": [
       "dev.u9g.JavaMain"
+    ],
+    "citresewn:condition": [
+      "dev.u9g.ConditionInTeam::CONTAINER"
     ]
   },
   "mixins": [
