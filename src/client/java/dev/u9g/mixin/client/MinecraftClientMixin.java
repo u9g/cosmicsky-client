@@ -31,7 +31,6 @@ public class MinecraftClientMixin {
         if (Settings.INSTANCE.getEnableMod() && Settings.INSTANCE.getDisableSwingingAtLowDurability() && item.getMaxDamage() - item.getDamage() < 10 && item.getItem().isDamageable()) {
             cir.setReturnValue(false);
             this.player.sendMessage(Text.of("§c§l(!) §cYou cannot hit anymore! Item durability is below 10! §eYou can toggle this in /skyplussettings"));
-            MinecraftClient.getInstance().getNetworkHandler().sendChatCommand("fix");
         }
     }
 
@@ -45,7 +44,7 @@ public class MinecraftClientMixin {
         }
     }
 
-    @Inject(method = "handleBlockBreaking", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "handleBlockBreaking", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/hit/BlockHitResult;getSide()Lnet/minecraft/util/math/Direction;"), cancellable = true)
     private void skyplus$handleBlockBreaking(boolean breaking, CallbackInfo ci) {
         if (this.player == null) return;
         ItemStack item = this.player.getStackInHand(Hand.MAIN_HAND);
