@@ -8,3 +8,5 @@ fun worldName() = MinecraftClient.getInstance().world?.registryKey?.value?.path.
         else -> it
     }
 } ?: "*" // if you can't get a world, send to * which will be shown to everyone
+
+val sectionCharColor = "§.".toRegex()
