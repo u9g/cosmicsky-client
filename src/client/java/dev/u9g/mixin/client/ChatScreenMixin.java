@@ -39,8 +39,8 @@ public abstract class ChatScreenMixin extends Screen {
                 cir.setReturnValue("/fix all");
             } else if (Settings.INSTANCE.getTAlias() && chatText.toLowerCase(Locale.ROOT).equals("/t")) {
                 cir.setReturnValue("/is tp Momica");
-            } else if (Settings.INSTANCE.getFAlias() && chatText.toLowerCase(Locale.ROOT).equals("/f")) {
-                cir.setReturnValue("/is warp RACC000N");
+            } else if (Settings.INSTANCE.getZAlias() && chatText.toLowerCase(Locale.ROOT).equals("/z")) {
+                cir.setReturnValue("/is tp Zercon");
             } else if (Settings.INSTANCE.getRedirectChatAToChatAlly() && (
                     chatText.toLowerCase(Locale.ROOT).equals("/c a") ||
                             chatText.toLowerCase(Locale.ROOT).equals("/chat a") ||

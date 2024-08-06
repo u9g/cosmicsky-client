@@ -16,7 +16,7 @@ object Settings {
     var shouldShowMobsPerSecond: Boolean = true
     var shouldAllowBreakingGlass: Boolean = false
     var tAlias: Boolean = true
-    var fAlias: Boolean = true
+    var zAlias: Boolean = true
     var singleEscapeClosesChat: Boolean = true
     var shouldHidePOINotification: Boolean = true
     var redirectChatAToChatAlly: Boolean = true
