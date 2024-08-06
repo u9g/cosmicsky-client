@@ -3,6 +3,7 @@ package dev.u9g
 import dev.u9g.commands.thenExecute
 import dev.u9g.events.CommandCallback
 import dev.u9g.events.CommandEvent
+import dev.u9g.events.ServerConnectCallback
 import dev.u9g.features.*
 import dev.u9g.features.`fun`.ImHighUp
 import dev.u9g.util.Coroutines
@@ -22,6 +23,10 @@ fun playSound(identifier: Identifier) {
     }
 }
 
+fun printSession(from: String) {
+    val sess = MinecraftClient.getInstance().session
+    println("from = $from | username = ${sess.username} | uuid or null = ${sess.uuidOrNull} | ${sess.accountType}")
+}
 
 object SkyplusClient : ClientModInitializer {
     override fun onInitializeClient() {
@@ -31,12 +36,20 @@ object SkyplusClient : ClientModInitializer {
         CommandCallback.event.register {
             it.register("skyplusre") {
                 thenExecute {
+                    println("[gg] skyplus reset")
                     Websocket.reset()
                 }
             }
         }
 
-        Websocket
+        ServerConnectCallback.event.register {
+            println("[gg] websocket started/init'd on server connect")
+            Websocket
+            println("[gg] Session")
+            printSession("ServerConnectCallback")
+        }
+
+        // do not init websocket here or else it will be init'd with PlayerXXX bc lunar uses offline player username until joining a server
         Waypoints
         Calculator
         Coroutines
@@ -53,6 +66,8 @@ object SkyplusClient : ClientModInitializer {
         PetCooldowns
         ClueScrollManager
         MakeChaoticGreenForTeamMembers
+//        TeamFocus
+//        DownloadPosWhenRightClicking
 //        ChaoticZoneEnter
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
