@@ -9,6 +9,8 @@
     "ExampleClientMixin",
     "GenericContainerScreenMixin",
     "MinecraftClientMixin",
+    "SocialInteractionsPlayerListEntryMixin",
+    "SocialInteractionsPlayerListWidgetMixin",
     "events.ClientPlayerEventInteractionManagerMixin",
     "events.ClientPlayNetworkHandlerMixin",
     "events.ConnectScreenMixin",
