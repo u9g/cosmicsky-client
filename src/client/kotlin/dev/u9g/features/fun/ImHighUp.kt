@@ -5,8 +5,10 @@ import dev.u9g.events.ChatMessageReceivedCallback
 import dev.u9g.events.CommandCallback
 import dev.u9g.features.Settings
 import dev.u9g.mc
+import net.minecraft.client.MinecraftClient
 import java.text.DecimalFormat
 import kotlin.math.ceil
+
 
 object ImHighUp {
     private val regex = "ImHighUp's Balance: \\$([\\d,.]+)".toRegex()
@@ -44,7 +46,9 @@ object ImHighUp {
                             "$${addCommas.format(10_000 - balanceAsNumber)} away from a cf"
                         }
 
-                        mc.player?.networkHandler?.sendChatMessage("ImHighUp's Balance: $$balanceAsNumber (${jpTicketsString})")
+                        MinecraftClient.getInstance().submit {
+                            mc.player?.networkHandler?.sendChatMessage("ImHighUp's Balance: $$balanceAsNumber (${jpTicketsString})")
+                        }
                     }
                 }
             }
