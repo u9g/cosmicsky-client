@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import dev.u9g.events.WorldRenderLastEvent
 import dev.u9g.mc
 import dev.u9g.util.FirmFormatters
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gl.VertexBuffer
 import net.minecraft.client.render.*
 import net.minecraft.client.texture.Sprite
@@ -11,10 +12,12 @@ import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Box
+import net.minecraft.util.math.ColorHelper.Argb
 import net.minecraft.util.math.Vec3d
 import org.joml.Matrix4f
 import org.joml.Vector3f
-import java.lang.Math.pow
+import kotlin.math.pow
 
 @RenderContextDSL
 class RenderInWorldContext private constructor(
@@ -25,7 +28,7 @@ class RenderInWorldContext private constructor(
     val vertexConsumers: VertexConsumerProvider.Immediate,
 ) {
     private val buffer = tesselator.buffer
-    
+
     fun color(red: Float, green: Float, blue: Float, alpha: Float) {
         RenderSystem.setShaderColor(red, green, blue, alpha)
     }
@@ -111,7 +114,7 @@ class RenderInWorldContext private constructor(
     fun wireframeCube(blockPos: BlockPos, lineWidth: Float = 10F) {
         RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram)
         matrixStack.push()
-        RenderSystem.lineWidth(lineWidth / pow(camera.pos.squaredDistanceTo(blockPos.toCenterPos()), 0.25).toFloat())
+        RenderSystem.lineWidth(lineWidth / camera.pos.squaredDistanceTo(blockPos.toCenterPos()).pow(0.25).toFloat())
         matrixStack.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
         buildWireFrameCube(matrixStack.peek(), buffer)
         tesselator.draw()
@@ -142,19 +145,285 @@ class RenderInWorldContext private constructor(
             val lastNormal0 = lastNormal ?: normal
             lastNormal = normal
             buffer.vertex(matrix.positionMatrix, a.x.toFloat(), a.y.toFloat(), a.z.toFloat())
-                // TODO: should this be matrix.normalMatrix?
-                //       the actual code just puts matrix...
                 .normal(matrix.normalMatrix, lastNormal0.x, lastNormal0.y, lastNormal0.z)
                 .next()
             buffer.vertex(matrix.positionMatrix, b.x.toFloat(), b.y.toFloat(), b.z.toFloat())
-                // TODO: should this be matrix.normalMatrix?
-                //       the actual code just puts matrix...
                 .normal(matrix.normalMatrix, normal.x, normal.y, normal.z)
                 .next()
         }
         buffer.unfixColor()
 
         tesselator.draw()
+    }
+
+    private fun line(
+        matrix: MatrixStack.Entry, buffer: BufferBuilder,
+        x1: Number, y1: Number, z1: Number,
+        x2: Number, y2: Number, z2: Number,
+        lineWidth: Float
+    ) {
+        val camera = MinecraftClient.getInstance().cameraEntity ?: return
+        RenderSystem.lineWidth(
+            lineWidth / camera.pos.squaredDistanceTo(
+                Vec3d(x1.toDouble(), y1.toDouble(), z1.toDouble())
+            ).pow(0.25).toFloat()
+        )
+        line(
+            matrix,
+            buffer,
+            Vector3f(x1.toFloat(), y1.toFloat(), z1.toFloat()),
+            Vector3f(x2.toFloat(), y2.toFloat(), z2.toFloat())
+        )
+    }
+
+    private fun line(matrix: MatrixStack.Entry, buffer: BufferBuilder, from: Vector3f, to: Vector3f) {
+        val normal = to.sub(from, Vector3f()).mul(-1F)
+        buffer.vertex(matrix.positionMatrix, from.x, from.y, from.z)
+            .normal(matrix.normalMatrix, normal.x, normal.y, normal.z)
+            .color(0xFFFFFFFF.toInt())
+        buffer.vertex(matrix.positionMatrix, to.x, to.y, to.z)
+            .normal(matrix.normalMatrix, normal.x, normal.y, normal.z)
+            .color(0xFFFFFFFF.toInt())
+    }
+
+    /**
+     * Draws a box in world space, given the coordinates of the box, thickness of the lines, and color.
+     * TODO: write a more custom rendering function so we don't have to do this ugly translation of
+     * Minecraft's screen space rendering logic to a world space rendering function.
+     */
+    fun drawWireFrame(
+        box: Box,
+        color: Int,
+        thickness: Float,
+        depthTest: Boolean = true
+    ) {
+        val matrices = this.matrixStack
+        matrices.push()
+        val prevShader = RenderSystem.getShader()
+        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram)
+        RenderSystem.disableBlend()
+        RenderSystem.disableCull()
+        // RenderSystem.defaultBlendFunc()
+        RenderSystem.setShaderColor(
+            Argb.getRed(color) / 255f,
+            Argb.getGreen(color) / 255f,
+            Argb.getBlue(color) / 255f,
+            Argb.getAlpha(color) / 255f
+        )
+        if (!depthTest) {
+            RenderSystem.disableDepthTest()
+            RenderSystem.depthMask(false)
+        } else {
+            RenderSystem.enableDepthTest()
+        }
+        matrices.translate(-this.camera.pos.x, -this.camera.pos.y, -this.camera.pos.z)
+        val tess = RenderSystem.renderThreadTesselator()
+        val buf = tess.buffer
+        tess.buffer.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
+        val me = matrices.peek()
+
+        buf.color(255, 255, 255, 255)
+
+        // X Axis aligned lines
+        line(me, buf, box.minX, box.minY, box.minZ, box.maxX, box.minY, box.minZ, thickness)
+        line(me, buf, box.minX, box.maxY, box.minZ, box.maxX, box.maxY, box.minZ, thickness)
+        line(me, buf, box.minX, box.minY, box.maxZ, box.maxX, box.minY, box.maxZ, thickness)
+        line(me, buf, box.minX, box.maxY, box.maxZ, box.maxX, box.maxY, box.maxZ, thickness)
+
+        // Y Axis aligned lines
+        line(me, buf, box.minX, box.minY, box.minZ, box.minX, box.maxY, box.minZ, thickness)
+        line(me, buf, box.maxX, box.minY, box.minZ, box.maxX, box.maxY, box.minZ, thickness)
+        line(me, buf, box.minX, box.minY, box.maxZ, box.minX, box.maxY, box.maxZ, thickness)
+        line(me, buf, box.maxX, box.minY, box.maxZ, box.maxX, box.maxY, box.maxZ, thickness)
+
+        // Z Axis aligned lines
+        line(me, buf, box.minX, box.minY, box.minZ, box.minX, box.minY, box.maxZ, thickness)
+        line(me, buf, box.maxX, box.minY, box.minZ, box.maxX, box.minY, box.maxZ, thickness)
+        line(me, buf, box.minX, box.maxY, box.minZ, box.minX, box.maxY, box.maxZ, thickness)
+        line(me, buf, box.maxX, box.maxY, box.minZ, box.maxX, box.maxY, box.maxZ, thickness)
+
+        BufferRenderer.drawWithGlobalProgram(buf.end())
+
+        RenderSystem.depthMask(true)
+        RenderSystem.enableDepthTest()
+        RenderSystem.enableBlend()
+        RenderSystem.setShaderColor(
+            1f, 1f, 1f, 1f
+        )
+        RenderSystem.setShader { prevShader }
+        RenderSystem.enableCull()
+        matrices.pop()
+    }
+
+    /**
+     * This draw line function is intended to be used for drawing very few lines, as it's not the most efficient.
+     * For drawing many lines in a series, save them to an array and use the drawLineArray function.
+     */
+    fun drawLine(
+        startPos: Vec3d,
+        endPos: Vec3d,
+        color: Int,
+        thickness: Float,
+        depthTest: Boolean = true
+    ) {
+        val matrices = this.matrixStack
+        matrices.push()
+        val prevShader = RenderSystem.getShader()
+        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram)
+        RenderSystem.disableBlend()
+        RenderSystem.disableCull()
+        // RenderSystem.defaultBlendFunc()
+        RenderSystem.setShaderColor(
+            Argb.getRed(color) / 255f,
+            Argb.getGreen(color) / 255f,
+            Argb.getBlue(color) / 255f,
+            Argb.getAlpha(color) / 255f
+        )
+        if (!depthTest) {
+            RenderSystem.disableDepthTest()
+            RenderSystem.depthMask(false)
+        } else {
+            RenderSystem.enableDepthTest()
+        }
+        matrices.translate(-this.camera.pos.x, -this.camera.pos.y, -this.camera.pos.z)
+        val tess = RenderSystem.renderThreadTesselator()
+        val buf = tess.buffer
+        buf.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
+        val me = matrices.peek()
+
+        buf.color(255, 255, 255, 255)
+
+        line(
+            me,
+            buf,
+            startPos.x.toFloat(),
+            startPos.y.toFloat(),
+            startPos.z.toFloat(),
+            endPos.x.toFloat(),
+            endPos.y.toFloat(),
+            endPos.z.toFloat(),
+            thickness
+        )
+
+        BufferRenderer.drawWithGlobalProgram(buf.end())
+
+        RenderSystem.depthMask(true)
+        RenderSystem.enableDepthTest()
+        RenderSystem.enableBlend()
+        RenderSystem.setShaderColor(
+            1f, 1f, 1f, 1f
+        )
+        RenderSystem.setShader { prevShader }
+        RenderSystem.enableCull()
+        matrices.pop()
+    }
+
+    /**
+     * This function is intended to be used for drawing many lines in a series, as it's more efficient than the
+     * drawLine function being called many times in series.
+     */
+    fun drawLineArray(
+        posArr: List<Vec3d>,
+        color: Int,
+        thickness: Float,
+        depthTest: Boolean = true
+    ) {
+        val matrices = this.matrixStack
+        matrices.push()
+        val prevShader = RenderSystem.getShader()
+        RenderSystem.setShader(GameRenderer::getRenderTypeLinesProgram)
+        RenderSystem.disableBlend()
+        RenderSystem.disableCull()
+        // RenderSystem.defaultBlendFunc()
+        RenderSystem.setShaderColor(
+            Argb.getRed(color) / 255f,
+            Argb.getGreen(color) / 255f,
+            Argb.getBlue(color) / 255f,
+            Argb.getAlpha(color) / 255f
+        )
+        if (!depthTest) {
+            RenderSystem.disableDepthTest()
+            RenderSystem.depthMask(false)
+        } else {
+            RenderSystem.enableDepthTest()
+        }
+        matrices.translate(-this.camera.pos.x, -this.camera.pos.y, -this.camera.pos.z)
+        val tess = RenderSystem.renderThreadTesselator()
+        val buf = tess.buffer
+        buf.begin(VertexFormat.DrawMode.LINES, VertexFormats.LINES)
+        val me = matrices.peek()
+
+        buf.color(255, 255, 255, 255)
+
+        for (i in 0 until posArr.size - 1) {
+            val startPos = posArr[i]
+            val endPos = posArr[i + 1]
+            line(
+                me,
+                buf,
+                startPos.x.toFloat(),
+                startPos.y.toFloat(),
+                startPos.z.toFloat(),
+                endPos.x.toFloat(),
+                endPos.y.toFloat(),
+                endPos.z.toFloat(),
+                thickness
+            )
+        }
+
+        BufferRenderer.drawWithGlobalProgram(buf.end())
+
+        RenderSystem.depthMask(true)
+        RenderSystem.enableDepthTest()
+        RenderSystem.enableBlend()
+        RenderSystem.setShaderColor(
+            1f, 1f, 1f, 1f
+        )
+        RenderSystem.setShader { prevShader }
+        RenderSystem.enableCull()
+        matrices.pop()
+    }
+
+    /**
+     * Draws a filled box at a given position
+     */
+    fun drawBox(
+        x: Double,
+        y: Double,
+        z: Double,
+        width: Double,
+        height: Double,
+        depth: Double,
+        color: Int,
+        depthTest: Boolean
+    ) {
+        if (!depthTest) {
+            RenderSystem.disableDepthTest()
+            //RenderSystem.depthMask(false)
+        } else {
+            RenderSystem.enableDepthTest()
+        }
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram)
+        RenderSystem.enableBlend()
+        RenderSystem.defaultBlendFunc()
+
+        val matrices = this.matrixStack
+        val tes = Tessellator.getInstance()
+        val buf = tes.buffer
+        buf.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR)
+        matrices.push()
+        matrices.translate(x - this.camera.pos.x, y - this.camera.pos.y, z - this.camera.pos.z)
+        WorldRenderer.renderFilledBox(
+            matrices, buf, 0.0, 0.0, 0.0, width, height, depth,
+            Argb.getRed(color) / 255f,
+            Argb.getGreen(color) / 255f,
+            Argb.getBlue(color) / 255f,
+            Argb.getAlpha(color) / 255f
+        )
+
+        BufferRenderer.drawWithGlobalProgram(buf.end())
+        RenderSystem.enableDepthTest()
+        matrices.pop()
     }
 
     companion object {
