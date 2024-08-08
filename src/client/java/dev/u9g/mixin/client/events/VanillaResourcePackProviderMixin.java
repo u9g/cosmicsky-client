@@ -1,4 +1,4 @@
-package dev.u9g.mixin.client;
+package dev.u9g.mixin.client.events;
 
 import net.minecraft.resource.ResourcePackProfile;
 import net.minecraft.resource.VanillaResourcePackProvider;
