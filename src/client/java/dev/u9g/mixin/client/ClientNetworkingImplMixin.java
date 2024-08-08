@@ -1,6 +1,7 @@
 package dev.u9g.mixin.client;
 
 import net.fabricmc.fabric.impl.networking.client.ClientNetworkingImpl;
+import net.fabricmc.loader.api.FabricLoader;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -11,6 +12,8 @@ public class ClientNetworkingImplMixin {
     @Inject(at = @At("HEAD"), method = "setClientConfigurationAddon", cancellable = true)
     private static void skyplus$setClientConfigurationAddon(CallbackInfo info) {
         // This code is injected into the start of Minecraft.run()V
-        info.cancel();
+        if (FabricLoader.getInstance().getModContainer("gadget").isEmpty()) {
+            info.cancel();
+        }
     }
 }
