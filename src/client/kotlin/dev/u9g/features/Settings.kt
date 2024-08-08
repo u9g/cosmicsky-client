@@ -5,7 +5,6 @@ import dev.u9g.commands.get
 import dev.u9g.commands.thenArgument
 import dev.u9g.commands.thenExecute
 import dev.u9g.events.CommandCallback
-import dev.u9g.webSocket
 
 object Settings {
     var showPingsInGame: Boolean = true
@@ -21,6 +20,8 @@ object Settings {
     var shouldHidePOINotification: Boolean = true
     var redirectChatAToChatAlly: Boolean = true
     var teamMembers: List<String> = listOf()
+    var colorMaxEnchants: Boolean = true
+    var focusedPlayerUsername: String = "PolaBeahr"
     var enableMod: Boolean = false
 
     init {
