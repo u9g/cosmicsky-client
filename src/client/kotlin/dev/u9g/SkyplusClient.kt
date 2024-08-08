@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.sound.PositionedSoundInstance
 import net.minecraft.sound.SoundEvent
+import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 
 
@@ -36,7 +37,11 @@ object SkyplusClient : ClientModInitializer {
         CommandCallback.event.register {
             it.register("skyplusre") {
                 thenExecute {
-                    println("[gg] skyplus reset")
+                    println("[gg] /skyplusre (forcing isRestarting to false)")
+                    if (Websocket.isRestarting) {
+                        MinecraftClient.getInstance().player?.sendMessage(Text.of("Tried restarting when isRestarting=true, forcing isRestarting to false"))
+                    }
+                    Websocket.isRestarting = false
                     Websocket.reset()
                 }
             }
