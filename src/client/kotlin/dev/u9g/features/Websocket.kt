@@ -144,6 +144,10 @@ object Websocket {
                             "redirect_chat_a_to_chat_ally" -> {
                                 Settings.redirectChatAToChatAlly = parsed["value"].asBoolean()
                             }
+
+                            "color_max_enchants" -> {
+                                Settings.colorMaxEnchants = parsed["value"].asBoolean()
+                            }
                         }
                     }
 
