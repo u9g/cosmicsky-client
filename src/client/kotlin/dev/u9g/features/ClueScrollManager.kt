@@ -2,6 +2,7 @@ package dev.u9g.features
 
 import dev.u9g.events.AfterDrawItemCallback
 import dev.u9g.events.GetTooltipCallback
+import dev.u9g.util.sectionCharColor
 import kotlinx.serialization.Serializable
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.item.TooltipContext
@@ -409,8 +410,8 @@ object ClueScrollManager {
         if (nbt != null && "clue_scroll" == nbt.getString("persistentItem")) {
             for (i in original.indices.reversed()) {
                 val t = original[i]
-
-                val line = t.string
+                
+                val line = sectionCharColor.replace(t.string, "")
 
                 if (line.startsWith(" * ")) {
                     val found = R.find(line, 0)
