@@ -20,8 +20,8 @@
     "defaultRequire": 1
   },
   "mixins": [
+    "EnchantmentMixin",
     "ItemMixin",
-    "ItemStackMixin",
     "TeamMixin",
     "events.ItemStackMixin",
     "events.LivingEntityMixin",
