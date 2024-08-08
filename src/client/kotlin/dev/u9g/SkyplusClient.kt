@@ -66,6 +66,7 @@ object SkyplusClient : ClientModInitializer {
         PetCooldowns
         ClueScrollManager
         MakeChaoticGreenForTeamMembers
+        CheckShieldWhenAdventureEnter
 //        TeamFocus
 //        DownloadPosWhenRightClicking
 //        ChaoticZoneEnter
