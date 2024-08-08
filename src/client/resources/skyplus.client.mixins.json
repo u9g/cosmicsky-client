@@ -5,8 +5,6 @@
   "client": [
     "ChatScreenMixin",
     "ClientNetworkingImplMixin",
-    "DrawContextMixin",
-    "ExampleClientMixin",
     "GenericContainerScreenMixin",
     "MinecraftClientMixin",
     "SocialInteractionsPlayerListEntryMixin",
@@ -25,7 +23,7 @@
     "ItemMixin",
     "ItemStackMixin",
     "TeamMixin",
-    "VanillaResourcePackProviderMixin",
+    "events.ItemStackMixin",
     "events.LivingEntityMixin",
     "events.WorldMixin"
   ]
