@@ -49,12 +49,12 @@ object SkyplusClient : ClientModInitializer {
 
         ServerConnectCallback.event.register {
             println("[gg] websocket started/init'd on server connect")
-            Websocket
+            Websocket.reset()
             println("[gg] Session")
             printSession("ServerConnectCallback")
         }
 
-        // do not init websocket here or else it will be init'd with PlayerXXX bc lunar uses offline player username until joining a server
+        Websocket
         Waypoints
         Calculator
         Coroutines

@@ -211,10 +211,6 @@ object Websocket {
     var isRestarting = false
     private val executor = Executors.newFixedThreadPool(2)
 
-    init {
-        websocket.connect()
-    }
-
     fun reset() {
         if (!isRestarting) {
             isRestarting = true
