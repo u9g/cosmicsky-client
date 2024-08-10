@@ -218,6 +218,7 @@ object ClueScrollManager {
                                 "CARROT" to ItemStack(Items.CARROT),
                                 "WHEAT" to ItemStack(Items.WHEAT),
                                 "POTATO" to ItemStack(Items.POTATO),
+                                "PUMPKIN" to ItemStack(Items.PUMPKIN),
                             )[step],
                             x, y
                         )
@@ -231,6 +232,7 @@ object ClueScrollManager {
                                 "ROTTEN_FLESH" to ItemStack(Items.ROTTEN_FLESH),
                                 "GOLDEN_NUGGET" to ItemStack(Items.GOLD_NUGGET),
                                 "MELON" to ItemStack(Items.MELON),
+                                "PUMPKIN" to ItemStack(Items.PUMPKIN),
                                 "POTATO" to ItemStack(Items.POTATO),
                                 "BEETROOT" to ItemStack(Items.BEETROOT),
                                 "CARROT" to ItemStack(Items.CARROT),
@@ -410,7 +412,7 @@ object ClueScrollManager {
         if (nbt != null && "clue_scroll" == nbt.getString("persistentItem")) {
             for (i in original.indices.reversed()) {
                 val t = original[i]
-                
+
                 val line = sectionCharColor.replace(t.string, "")
 
                 if (line.startsWith(" * ")) {
