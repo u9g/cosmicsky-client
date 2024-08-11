@@ -15,6 +15,7 @@ import java.util.concurrent.Executors
 
 object Websocket {
     private var lastTimeSendingMessage = 0L
+    private var hasConnectedOnce = false
     private var websocket = com.neovisionaries.ws.client.WebSocketFactory()
         .createSocket("wss://cosmicsky-server.onrender.com")
         .setPingInterval(10)
@@ -172,17 +173,17 @@ object Websocket {
             override fun onConnected(websocket: WebSocket?, headers: MutableMap<String, MutableList<String>>?) {
                 super.onConnected(websocket, headers)
 
-                MinecraftClient.getInstance().player?.sendMessage(Text.of("§b§l(!) SkyPlus -> §eWebsocket successfully connected!"))
-
                 MinecraftClient.getInstance().session.uuidOrNull?.let {
                     printSession("MinecraftClient.getInstance().session.uuidOrNull")
+                    MinecraftClient.getInstance().player?.sendMessage(Text.of("§b§l(!) SkyPlus -> §eWebsocket successfully connected!"))
                     isRestarting = false
+                    hasConnectedOnce = true
                     sendText(
                         jsonObjectOf(
                             "type" to "connected",
                             "username" to MinecraftClient.getInstance().session.username,
                             "uuid" to it.toString(),
-                            "version" to "1.3.0"
+                            "version" to "1.2.9"
                         )
                     )
                 }
@@ -194,9 +195,14 @@ object Websocket {
                 clientCloseFrame: WebSocketFrame?,
                 closedByServer: Boolean
             ) {
-                if (!isRestarting) {
+                if (!isRestarting && hasConnectedOnce) {
                     if (System.currentTimeMillis() - lastTimeSendingMessage > 500) {
-                        MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l[!] SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre"))
+                        val closedBy = if (closedByServer) {
+                            "server"
+                        } else {
+                            "client"
+                        }
+                        MinecraftClient.getInstance().player?.sendMessage(Text.of("§a§l[!] SEVERE!!! §aWebsocket disconnected! Reconnect with /skyplusre (closed by $closedBy)"))
                         lastTimeSendingMessage = System.currentTimeMillis()
                     }
                     executor.submit {
@@ -210,6 +216,13 @@ object Websocket {
 
     var isRestarting = false
     private val executor = Executors.newFixedThreadPool(2)
+
+    init {
+        isRestarting = true
+        executor.submit {
+            websocket.connect()
+        }
+    }
 
     fun reset() {
         if (!isRestarting) {
