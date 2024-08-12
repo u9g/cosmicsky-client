@@ -6,6 +6,7 @@
     "ChatScreenMixin",
     "ClientNetworkingImplMixin",
     "GenericContainerScreenMixin",
+    "HeadFeatureRendererMixin",
     "MinecraftClientMixin",
     "SocialInteractionsPlayerListEntryMixin",
     "SocialInteractionsPlayerListWidgetMixin",

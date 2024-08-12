@@ -74,6 +74,10 @@ object Websocket {
                         }
                     }
 
+                    "focus" -> {
+                        Settings.focusedPlayerUsername = parsed["username"].asString()
+                    }
+
                     "notification" -> {
                         if (parsed["json"] != null) {
                             MinecraftClient.getInstance().inGameHud.chatHud.addMessage(

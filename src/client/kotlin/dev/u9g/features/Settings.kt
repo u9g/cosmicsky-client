@@ -1,5 +1,6 @@
 package dev.u9g.features
 
+import com.mojang.brigadier.arguments.StringArgumentType
 import dev.u9g.commands.RestArgumentType
 import dev.u9g.commands.get
 import dev.u9g.commands.thenArgument
@@ -21,11 +22,25 @@ object Settings {
     var redirectChatAToChatAlly: Boolean = true
     var teamMembers: List<String> = listOf()
     var colorMaxEnchants: Boolean = true
-    var focusedPlayerUsername: String = "PolaBeahr"
+    var focusedPlayerUsername: String = "gg"
     var enableMod: Boolean = false
 
     init {
         CommandCallback.event.register {
+            it.deleteCommand("f")
+            it.register("f") {
+                thenArgument("username", StringArgumentType.string()) { username ->
+                    thenExecute {
+                        Websocket.sendText(
+                            jsonObjectOf(
+                                "type" to "focus",
+                                "username" to this[username]
+                            )
+                        )
+                    }
+                }
+            }
+
             it.register("skyplussettings") {
                 thenExecute {
                     Websocket.sendText(
