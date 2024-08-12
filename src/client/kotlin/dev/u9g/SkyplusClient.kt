@@ -72,7 +72,8 @@ object SkyplusClient : ClientModInitializer {
         ClueScrollManager
         MakeChaoticGreenForTeamMembers
         CheckShieldWhenAdventureEnter
-//        TeamFocus
+        TeamFocus
+        LogPv
 //        DownloadPosWhenRightClicking
 //        ChaoticZoneEnter
 
