@@ -7,9 +7,24 @@ import dev.u9g.commands.thenExecute
 import dev.u9g.events.CommandCallback
 import net.minecraft.client.MinecraftClient
 
+fun pvInfoOfUsername(username: String) {
+    Websocket.sendText(
+        jsonObjectOf(
+            "type" to "pv_info_of",
+            "player_username" to username
+        )
+    )
+}
+
 object Teams {
     init {
         CommandCallback.event.register {
+            it.register("pvs") {
+                thenExecute {
+                    pvInfoOfUsername(MinecraftClient.getInstance().session.username)
+                }
+            }
+
             it.register("createteam") {
                 thenArgument("team name", StringArgumentType.string()) { teamName ->
                     thenExecute {

@@ -4,8 +4,11 @@ import com.eclipsesource.json.Json
 import com.neovisionaries.ws.client.WebSocket
 import com.neovisionaries.ws.client.WebSocketAdapter
 import com.neovisionaries.ws.client.WebSocketFrame
+import dev.u9g.PlayerScreen
+import dev.u9g.mc
 import dev.u9g.playSound
 import dev.u9g.printSession
+import dev.u9g.util.ScreenUtil
 import dev.u9g.util.worldName
 import net.minecraft.client.MinecraftClient
 import net.minecraft.text.Text
@@ -21,7 +24,9 @@ object Websocket {
         .setPingInterval(10)
         .addListener(object : WebSocketAdapter() {
             override fun onTextMessage(ws: WebSocket, message: String) {
-                println("received message: $message")
+                if (!message.contains("\"type\";\"pv\"")) {
+                    println("received message: $message")
+                }
 
                 val parsed = Json.parse(message).asObject()
                 val type = parsed["type"].asString()
@@ -168,6 +173,21 @@ object Websocket {
                         }
                     }
 
+                    "pv" -> {
+                        mc.submit {
+                            ScreenUtil.setScreenLater(null)
+                            mc.submit {
+                                ScreenUtil.setScreenLater(
+                                    PlayerScreen(
+                                        parsed["pvs"],
+                                        parsed["usernames"].asArray(),
+                                        parsed["currentUsername"].asString()
+                                    ),
+                                )
+                            }
+                        }
+                    }
+
                     else -> {
                         println("Unexpected message type from websocket: $type")
                     }
@@ -187,7 +207,7 @@ object Websocket {
                             "type" to "connected",
                             "username" to MinecraftClient.getInstance().session.username,
                             "uuid" to it.toString(),
-                            "version" to "1.3.0"
+                            "version" to "1.3.1"
                         )
                     )
                 }
