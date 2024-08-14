@@ -7,6 +7,7 @@ import dev.u9g.mc
 import dev.u9g.util.MoveHudOnScreen
 import dev.u9g.util.ScreenUtil
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
@@ -35,6 +36,7 @@ fun formatTime(seconds: Long): String {
 }
 
 // PET: Dire Wolf [Dire Wolf Buff (2x Mobs Killed per Stack [35s])]
+// TODO: FIX: PET: Dire Wolf [Dire Wolf Buff (2x Mobs Killed per Stack [1m 5s])]
 
 class Cooldown(
     var cooldownInSeconds: Int,
@@ -46,7 +48,7 @@ class Cooldown(
 
     fun color() = "§" + this.colorString
 
-    open fun timeStr(): String {
+    fun timeStr(): String {
         val timeSinceLastUsed = if (MinecraftClient.getInstance().currentScreen is MoveHudOnScreen) {
             System.currentTimeMillis() - (this.cooldownInSeconds * 1000) / 2
         } else {
@@ -62,7 +64,13 @@ data class CooldownSettings(
     var middleXPercent: Double = 50.0,
     var middleYPercent: Double = 50.0,
     var isBackgroundOn: Boolean = true,
-    var isEnabled: Boolean = true
+    var isEnabled: Boolean = true,
+
+    var shouldShowIsWarpsInChat: Boolean = false,
+    var shouldShowCfs: Boolean = false,
+    var filter: String = "",
+    @Transient
+    var filterRegex: Regex = "".toRegex()
 )
 
 val SETTINGS_FILE_PATH: Path = File("cooldown_hud_settings.json").toPath()
@@ -114,6 +122,18 @@ object CooldownManager {
 
     private fun setIsEnabled(isEnabled: Boolean) {
         settings.isEnabled = isEnabled
+
+        serializeSettings()
+    }
+
+    fun setShouldShowIsWarpsInChat(shouldShowIsWarpsInChat: Boolean) {
+        settings.shouldShowIsWarpsInChat = shouldShowIsWarpsInChat
+
+        serializeSettings()
+    }
+
+    fun setShouldShowCfs(shouldShowCfs: Boolean) {
+        settings.shouldShowCfs = shouldShowCfs
 
         serializeSettings()
     }

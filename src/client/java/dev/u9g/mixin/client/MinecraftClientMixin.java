@@ -1,9 +1,13 @@
 package dev.u9g.mixin.client;
 
+import dev.u9g.SkyplusClientKt;
+import dev.u9g.features.GoGo;
 import dev.u9g.features.Settings;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MinecraftClient.class)
-public class MinecraftClientMixin {
+public abstract class MinecraftClientMixin {
     @Shadow
     @Nullable
     public ClientPlayerEntity player;
@@ -24,10 +28,53 @@ public class MinecraftClientMixin {
 //    @Nullable
 //    public ClientWorld world;
 
+    @Shadow
+    protected abstract void doItemUse();
+
     @Inject(method = "doAttack", at = @At("HEAD"), cancellable = true)
     private void skyplus$doAttack(CallbackInfoReturnable<Boolean> cir) {
         if (this.player == null) return;
+
         ItemStack item = this.player.getStackInHand(Hand.MAIN_HAND);
+
+        if (item.getItem() == Items.PLAYER_HEAD) {
+            if (!GoGo.INSTANCE.getHasUsed()) {
+                this.doItemUse();
+                GoGo.INSTANCE.setHasUsed(true);
+            } else {
+                player.getInventory().selectedSlot = 0;
+                GoGo.INSTANCE.setHasUsed(false);
+            }
+            cir.setReturnValue(false);
+            return;
+        }
+
+        if (GoGo.INSTANCE.getNextI() != null) {
+            int i = GoGo.INSTANCE.getNextI();
+            SkyplusClientKt.getMc().interactionManager.clickSlot(0, 36 + 1 + i, 0, SlotActionType.PICKUP, player);
+            SkyplusClientKt.getMc().interactionManager.clickSlot(0, 28 + i, 0, SlotActionType.PICKUP, player);
+            SkyplusClientKt.getMc().interactionManager.clickSlot(0, 36 + 1 + i, 0, SlotActionType.PICKUP, player);
+            if (i < 8) {
+                GoGo.INSTANCE.setNextI(i + 1);
+            } else {
+                GoGo.INSTANCE.setNextI(null);
+            }
+            cir.setReturnValue(false);
+            return;
+        }
+
+        if (GoGo.INSTANCE.getGoNext()) {
+            int next = GoGo.INSTANCE.findNext();
+            if (next != -1) {
+                player.getInventory().selectedSlot = next;
+            } else {
+                GoGo.INSTANCE.setNextI(0);
+            }
+            GoGo.INSTANCE.setGoNext(false);
+            cir.setReturnValue(false);
+            return;
+        }
+
         if (Settings.INSTANCE.getEnableMod() && Settings.INSTANCE.getDisableSwingingAtLowDurability() && item.getMaxDamage() - item.getDamage() < 10 && item.getItem().isDamageable()) {
             cir.setReturnValue(false);
             this.player.sendMessage(Text.of("§c§l(!) §cYou cannot hit anymore! Item durability is below 10! §eYou can toggle this in /skyplussettings"));

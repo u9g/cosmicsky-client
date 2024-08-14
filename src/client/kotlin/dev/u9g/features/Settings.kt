@@ -5,6 +5,7 @@ import dev.u9g.commands.RestArgumentType
 import dev.u9g.commands.get
 import dev.u9g.commands.thenArgument
 import dev.u9g.commands.thenExecute
+import dev.u9g.events.ChatMessageReceivedCallback
 import dev.u9g.events.CommandCallback
 
 object Settings {
@@ -26,6 +27,11 @@ object Settings {
     var enableMod: Boolean = false
 
     init {
+        ChatMessageReceivedCallback.event.register {
+            if (it.msg == "(!) Your inventory is currently full! Make some room to pickup more items!") {
+            }
+        }
+
         CommandCallback.event.register {
             it.deleteCommand("f")
             it.register("f") {
