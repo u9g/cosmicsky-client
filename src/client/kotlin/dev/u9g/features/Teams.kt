@@ -19,7 +19,7 @@ fun pvInfoOfUsername(username: String) {
 object Teams {
     init {
         CommandCallback.event.register {
-            it.register("pvs") {
+            it.register("adminbypasswalls") {
                 thenExecute {
                     pvInfoOfUsername(MinecraftClient.getInstance().session.username)
                 }
