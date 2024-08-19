@@ -1,5 +1,8 @@
 package dev.u9g.features
 
+import com.mojang.brigadier.arguments.StringArgumentType
+import dev.u9g.commands.get
+import dev.u9g.commands.thenArgument
 import dev.u9g.commands.thenExecute
 import dev.u9g.events.ChatMessageReceivedCallback
 import dev.u9g.events.CommandCallback
@@ -7,6 +10,7 @@ import dev.u9g.mc
 import dev.u9g.util.MoveHudOnScreen
 import dev.u9g.util.ScreenUtil
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
@@ -14,6 +18,7 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.nbt.StringNbtReader
+import net.minecraft.text.Text
 import java.io.File
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
@@ -62,7 +67,15 @@ data class CooldownSettings(
     var middleXPercent: Double = 50.0,
     var middleYPercent: Double = 50.0,
     var isBackgroundOn: Boolean = true,
-    var isEnabled: Boolean = true
+    var isEnabled: Boolean = true,
+
+    var filterString: String = "",
+    var filterAllowString: String = ".*",
+
+    @Transient
+    var filterRegex: Regex = filterString.toRegex(RegexOption.IGNORE_CASE),
+    @Transient
+    var filterAllowRegex: Regex = filterString.toRegex(RegexOption.IGNORE_CASE)
 )
 
 val SETTINGS_FILE_PATH: Path = File("cooldown_hud_settings.json").toPath()
@@ -118,6 +131,20 @@ object CooldownManager {
         serializeSettings()
     }
 
+    private fun setFilterString(filterString: String) {
+        settings.filterString = filterString
+        settings.filterRegex = filterString.toRegex(RegexOption.IGNORE_CASE)
+
+        serializeSettings()
+    }
+
+    private fun setFilterAllowString(filterString: String) {
+        settings.filterAllowString = filterString
+        settings.filterAllowRegex = filterString.toRegex(RegexOption.IGNORE_CASE)
+
+        serializeSettings()
+    }
+
     init {
         try {
             settings = Json.decodeFromString(SETTINGS_FILE_PATH.readText())
@@ -136,6 +163,32 @@ object CooldownManager {
                             ::setIsEnabled
                         )
                     )
+                }
+            }
+
+            it.register("filterchat") {
+                thenArgument("filter string", StringArgumentType.string()) { arg ->
+                    thenExecute {
+                        try {
+                            setFilterString(this[arg])
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            mc.player?.sendMessage(Text.of("Failed to set filter"))
+                        }
+                    }
+                }
+            }
+
+            it.register("filterallowchat") {
+                thenArgument("filter string", StringArgumentType.string()) { arg ->
+                    thenExecute {
+                        try {
+                            setFilterAllowString(this[arg])
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            mc.player?.sendMessage(Text.of("Failed to set filter"))
+                        }
+                    }
                 }
             }
         }

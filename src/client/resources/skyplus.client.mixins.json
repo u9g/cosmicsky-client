@@ -3,6 +3,9 @@
   "package": "dev.u9g.mixin.client",
   "compatibilityLevel": "JAVA_17",
   "client": [
+    "ChatHudLineMixin",
+    "ChatHudLineVisibleMixin",
+    "ChatHudMixin",
     "ChatScreenMixin",
     "ClientNetworkingImplMixin",
     "GenericContainerScreenMixin",
