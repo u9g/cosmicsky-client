@@ -63,11 +63,24 @@ object ChatNotifier {
         }
 
         ChatMessageReceivedCallback.event.register {
+            if ("(!) Bleed - READY" == it.msg.trim()) return@register
+            if ("No players bet on the winner!" == it.msg.trim()) return@register
+            if ("*** Sheep Roulette has finished! ***" == it.msg.trim()) return@register
+            if ("*** Sheep Roulette has begun! ***" == it.msg.trim()) return@register
+            if ("(.+) Sheep is glowing! \\(\\+[\\d.]+x Prize Bonus\\)".toRegex().matches(it.msg)) return@register
+
             if ("\\(!\\) (.+) has found a Legendary Clue Scroll!".toRegex().matches(it.msg)) return@register
-            if (".*\\(!\\).+ opened a .+Lootbox(:|( Bundle)).* and received:".toRegex()
+            if ("\\(!\\) (.+) has found a Legendary Clue Scroll while .+!".toRegex().matches(it.msg)) return@register
+            if ("^\\[/bah].+".toRegex().matches(it.msg)) return@register
+            if ("^[0-9,]+ ticket\\(s\\) sold!".toRegex().matches(it.msg)) return@register
+
+            if ("Winning Sheep: (.+) Sheep \\(\\d+ x\\)".toRegex().matches(it.msg)) return@register
+
+            if (".*\\(!\\).* opened a .*Lootbox(:|( Bundle)).* and received:".toRegex()
                     .matches(it.msg)
             ) return@register
-            if ("^(.+ )?\\* .+".toRegex()
+
+            if ("^ ?\\* .+".toRegex()
                     .matches(it.msg)
             ) return@register
 
@@ -75,7 +88,11 @@ object ChatNotifier {
                     .matches(it.msg)
             ) return@register
 
-            if ("\\(!\\) Cosmic Jackpot \\(\\$[0-9,]+\\) drawing in \\d+m!".toRegex()
+            if ("\\(!\\) .+ has won the /jackpot and received".toRegex()
+                    .matches(it.msg)
+            ) return@register
+
+            if ("\\(!\\) Cosmic Jackpot.+".toRegex()
                     .matches(it.msg)
             ) return@register
 
@@ -91,11 +108,22 @@ object ChatNotifier {
                     .matches(it.msg)
             ) return@register
 
+            if ("\\(!\\) .+ won the /bah on:".toRegex()
+                    .matches(it.msg)
+            ) return@register
+
+            if ("\\$[0-9,]+!".toRegex()
+                    .matches(it.msg)
+            ) return@register
+
+            if ("\\(!\\) .+ has taken control /baltop #\\d with".toRegex()
+                    .matches(it.msg)
+            ) return@register
+
             if ("(!) Items are waiting to be recovered in the /is bin!" == it.msg) return@register
 
             if ("Use /bah to view and place bids!" == it.msg) return@register
-            if ("Time: \\d minutes".toRegex().matches(it.msg)) return@register
-            if ("Item: .+".toRegex().matches(it.msg)) return@register
+            if ("((Item)|(Winning Bid)|(Time)): .+".toRegex().matches(it.msg)) return@register
 
 
             if (it.msg.trim() == "") return@register
