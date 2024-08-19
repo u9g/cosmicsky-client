@@ -1,13 +1,11 @@
 package dev.u9g.mixin.client;
 
-import dev.u9g.SkyplusClientKt;
 import dev.u9g.features.GoGo;
 import dev.u9g.features.Settings;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import org.jetbrains.annotations.Nullable;
@@ -49,27 +47,27 @@ public abstract class MinecraftClientMixin {
             return;
         }
 
-        if (GoGo.INSTANCE.getNextI() != null) {
-            int i = GoGo.INSTANCE.getNextI();
-            SkyplusClientKt.getMc().interactionManager.clickSlot(0, 36 + 1 + i, 0, SlotActionType.PICKUP, player);
-            SkyplusClientKt.getMc().interactionManager.clickSlot(0, 28 + i, 0, SlotActionType.PICKUP, player);
-            SkyplusClientKt.getMc().interactionManager.clickSlot(0, 36 + 1 + i, 0, SlotActionType.PICKUP, player);
-            if (i < 8) {
-                GoGo.INSTANCE.setNextI(i + 1);
-            } else {
-                GoGo.INSTANCE.setNextI(null);
-            }
-            cir.setReturnValue(false);
-            return;
-        }
+//        if (GoGo.INSTANCE.getNextI() != null) {
+//            int i = GoGo.INSTANCE.getNextI();
+//            SkyplusClientKt.getMc().interactionManager.clickSlot(0, 36 + 1 + i, 0, SlotActionType.PICKUP, player);
+//            SkyplusClientKt.getMc().interactionManager.clickSlot(0, 28 + i, 0, SlotActionType.PICKUP, player);
+//            SkyplusClientKt.getMc().interactionManager.clickSlot(0, 36 + 1 + i, 0, SlotActionType.PICKUP, player);
+//            if (i < 8) {
+//                GoGo.INSTANCE.setNextI(i + 1);
+//            } else {
+//                GoGo.INSTANCE.setNextI(null);
+//            }
+//            cir.setReturnValue(false);
+//            return;
+//        }
 
         if (GoGo.INSTANCE.getGoNext()) {
             int next = GoGo.INSTANCE.findNext();
             if (next != -1) {
                 player.getInventory().selectedSlot = next;
-            } else {
+            }/* else {
                 GoGo.INSTANCE.setNextI(0);
-            }
+            }*/
             GoGo.INSTANCE.setGoNext(false);
             cir.setReturnValue(false);
             return;

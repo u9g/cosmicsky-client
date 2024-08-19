@@ -1,25 +1,11 @@
 package dev.u9g.mixin.client;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import dev.u9g.features.CooldownManager;
-import it.unimi.dsi.fastutil.ints.IntLinkedOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.text.ClickEvent;
-import org.apache.commons.compress.utils.Lists;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Mixin(ChatHud.class)
 public class ChatHudMixin {
-    @WrapOperation(at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/ChatHud;visibleMessages:Ljava/util/List;"), method = "getIndicatorAt")
+    /*@WrapOperation(at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/ChatHud;visibleMessages:Ljava/util/List;"), method = "getIndicatorAt")
     private List<ChatHudLine.Visible> skyplus$getIndicatorAt(ChatHud instance, Operation<List<ChatHudLine.Visible>> original) {
         return overwriteVisibleMessageAccesses(instance, original);
     }
@@ -75,7 +61,7 @@ public class ChatHudMixin {
 //                sb2.appendCodePoint(codepoint);
 
                 ClickEvent ce = style.getClickEvent();
-                if ((!CooldownManager.INSTANCE.getSettings().getShouldShowCfs() && codepoint == 9632/* ■ */) || (!CooldownManager.INSTANCE.getSettings().getShouldShowIsWarpsInChat() && ce != null && ce.getValue().startsWith("/is warp "))) {
+                if ((!CooldownManager.INSTANCE.getSettings().getShouldShowCfs() && codepoint == 9632*//* ■ *//*) || (!CooldownManager.INSTANCE.getSettings().getShouldShowIsWarpsInChat() && ce != null && ce.getValue().startsWith("/is warp "))) {
                     s.add(element.addedTime());
                     shouldAdd.set(false);
                 }
@@ -102,5 +88,5 @@ public class ChatHudMixin {
         vv.removeIf((x) -> s.contains(x.addedTime()));
 
         return vv;
-    }
+    }*/
 }
