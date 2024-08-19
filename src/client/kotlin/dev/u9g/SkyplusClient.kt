@@ -74,6 +74,7 @@ object SkyplusClient : ClientModInitializer {
         CheckShieldWhenAdventureEnter
         TeamFocus
         LogPv
+        ChatNotifier
 //        DownloadPosWhenRightClicking
 //        ChaoticZoneEnter
 
