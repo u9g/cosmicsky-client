@@ -75,7 +75,6 @@ object SkyplusClient : ClientModInitializer {
         TeamFocus
         LogPv
         AntiSpamKick
-//        ChatNotifier.enabled = true
 //        DownloadPosWhenRightClicking
 //        ChaoticZoneEnter
 
