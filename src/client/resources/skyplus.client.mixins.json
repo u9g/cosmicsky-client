@@ -8,6 +8,7 @@
     "ChatHudMixin",
     "ChatScreenMixin",
     "ClientNetworkingImplMixin",
+    "ClientPlayNetworkHandlerMixin",
     "GenericContainerScreenMixin",
     "HeadFeatureRendererMixin",
     "MinecraftClientMixin",
