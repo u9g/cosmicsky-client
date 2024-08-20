@@ -73,7 +73,7 @@ object SkyplusClient : ClientModInitializer {
         MakeChaoticGreenForTeamMembers
         CheckShieldWhenAdventureEnter
         TeamFocus
-        LogPv
+        ExcellentSocks
         AntiSpamKick
 //        DownloadPosWhenRightClicking
 //        ChaoticZoneEnter
