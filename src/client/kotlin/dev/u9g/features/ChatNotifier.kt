@@ -19,8 +19,15 @@ object ChatNotifier {
     private var prevXYZ: Vec3d? = null
     private var lastItem: Item? = null
 
+    var enabled = false
+
     init {
         ClientTickEvents.END_CLIENT_TICK.register {
+            if (mc.options.fov.value != 100 || !enabled) {
+                disable = false
+                return@register
+            }
+
             if (mc.player?.input?.sneaking == true) {
                 disable = false
             }
@@ -63,70 +70,54 @@ object ChatNotifier {
         }
 
         ChatMessageReceivedCallback.event.register {
-            if ("(!) Bleed - READY" == it.msg.trim()) return@register
-            if ("No players bet on the winner!" == it.msg.trim()) return@register
-            if ("*** Sheep Roulette has finished! ***" == it.msg.trim()) return@register
-            if ("*** Sheep Roulette has begun! ***" == it.msg.trim()) return@register
-            if ("(.+) Sheep is glowing! \\(\\+[\\d.]+x Prize Bonus\\)".toRegex().matches(it.msg)) return@register
+            if (mc.options.fov.value != 100 || !enabled) {
+                return@register
+            }
 
-            if ("\\(!\\) (.+) has found a Legendary Clue Scroll!".toRegex().matches(it.msg)) return@register
-            if ("\\(!\\) (.+) has found a Legendary Clue Scroll while .+!".toRegex().matches(it.msg)) return@register
-            if ("^\\[/bah].+".toRegex().matches(it.msg)) return@register
-            if ("^[0-9,]+ ticket\\(s\\) sold!".toRegex().matches(it.msg)) return@register
+            val t = it.msg.trim()
 
-            if ("Winning Sheep: (.+) Sheep \\(\\d+ x\\)".toRegex().matches(it.msg)) return@register
+            when (it.msg) {
+                "No players bet on the winner!",
+                "No bets placed on any sheep!",
+                "Use /jackpot buy to purchase a ticket!",
+                "Use /bah to view and place bids!",
+                "Shuttling you to the galaxy...",
+                "" -> return@register
+            }
 
-            if (".*\\(!\\).* opened a .*Lootbox(:|( Bundle)).* and received:".toRegex()
-                    .matches(it.msg)
+            if (listOf(
+                    "Hello .+, please setup /2fa \\(2-Factor\\) Authentication to secure and protect your CosmicSky account!".toRegex(),
+                    "(.+) Sheep is glowing! \\(\\+[\\d.]+x Prize Bonus\\)".toRegex(),
+                    "^\\[/bah].+".toRegex(),
+                    "^[0-9,]+ ticket\\(s\\) sold!".toRegex(),
+                    "Winning Sheep: (.+) Sheep \\(\\d+ x\\)".toRegex(),
+                    "^ ?\\*\\*\\*.+\\*\\*\\* ?".toRegex(),
+//                "*** Sheep Roulette has begun! ***",
+//                "*** Sheep Roulette has finished! ***",
+//                "*** Sheep Roulette was cancelled! ***",
+                    "^ ?\\(!\\).+".toRegex(),
+//                    "\\(!\\) (.+) has found a [a-zA-Z]+ Clue Scroll!".toRegex(),
+//                    "\\(!\\) (.+) has found a [a-zA-Z]+ Clue Scroll while .+!".toRegex(),
+//                    "\\(!\\) .+ has won the /jackpot and received".toRegex(),
+//                    "\\(!\\) Cosmic Jackpot.+".toRegex(),
+//                    "\\(!\\) You found a [a-zA-Z]+ Clue Scroll from slaying!".toRegex(),
+//                    ".*\\(!\\).* opened a .*Lootbox(:|( Bundle)).* and received:".toRegex(),
+//                    "\\(!\\) .+ won the /bah on:".toRegex(),
+//                    "\\(!\\) .+ has taken control /baltop #\\d with".toRegex(),
+//                "(!) Bleed - READY",
+//                "(!) You have successfully joined the queue, you can use /queue to check your position in the queue!",
+//                "(!) Items are waiting to be recovered in the /is bin!",
+                    "^ ?\\*.+".toRegex(),
+//                    "^ ?\\* .+".toRegex(),
+//                    "\\* (.+)'s /island has unlocked Level \\d+!".toRegex(),
+//                    "\\* Inventory full, your [a-zA-Z]+ Clue Scroll has been placed in your /collect! \\*".toRegex(),
+//                    "\\* Inventory full, your [a-zA-Z]+ Clue Scroll has been placed in your /collect! \\*".toRegex(),
+//                "* Black Market Auction *",
+                    "\\$[0-9,]+!( They purchased .+)?".toRegex(),
+                    "^((Item)|(Winning Bid)|(Time)): .+".toRegex(),
+                    "^\\+ \\$[0-9,]".toRegex()
+                ).any { p -> p.matches(t) }
             ) return@register
-
-            if ("^ ?\\* .+".toRegex()
-                    .matches(it.msg)
-            ) return@register
-
-            if ("\\* (.+)'s /island has unlocked Level \\d+!".toRegex()
-                    .matches(it.msg)
-            ) return@register
-
-            if ("\\(!\\) .+ has won the /jackpot and received".toRegex()
-                    .matches(it.msg)
-            ) return@register
-
-            if ("\\(!\\) Cosmic Jackpot.+".toRegex()
-                    .matches(it.msg)
-            ) return@register
-
-            if ("Use /jackpot buy to purchase a ticket!".toRegex()
-                    .matches(it.msg)
-            ) return@register
-
-            if ("\\(!\\) You found a Legendary Clue Scroll from slaying!".toRegex()
-                    .matches(it.msg)
-            ) return@register
-
-            if ("\\* Inventory full, your Legendary Clue Scroll has been placed in your /collect! \\*".toRegex()
-                    .matches(it.msg)
-            ) return@register
-
-            if ("\\(!\\) .+ won the /bah on:".toRegex()
-                    .matches(it.msg)
-            ) return@register
-
-            if ("\\$[0-9,]+!".toRegex()
-                    .matches(it.msg)
-            ) return@register
-
-            if ("\\(!\\) .+ has taken control /baltop #\\d with".toRegex()
-                    .matches(it.msg)
-            ) return@register
-
-            if ("(!) Items are waiting to be recovered in the /is bin!" == it.msg) return@register
-
-            if ("Use /bah to view and place bids!" == it.msg) return@register
-            if ("((Item)|(Winning Bid)|(Time)): .+".toRegex().matches(it.msg)) return@register
-
-
-            if (it.msg.trim() == "") return@register
 
             val req = HttpRequest.newBuilder()
                 .uri(URI("http://194.135.104.189/iloveloxtech"))
