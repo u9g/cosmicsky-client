@@ -34,7 +34,7 @@ fun formatTime(seconds: Long): String {
     return stringBuilder.toString()
 }
 
-// PET: Dire Wolf [Dire Wolf Buff (2x Mobs Killed per Stack [35s])]
+// PET: Dire Wolf [Dire Wolf Buff (2x Mobs Killed per Stack [1m 35s])]
 
 class Cooldown(
     var cooldownInSeconds: Int,
@@ -46,7 +46,7 @@ class Cooldown(
 
     fun color() = "§" + this.colorString
 
-    open fun timeStr(): String {
+    fun timeStr(): String {
         val timeSinceLastUsed = if (MinecraftClient.getInstance().currentScreen is MoveHudOnScreen) {
             System.currentTimeMillis() - (this.cooldownInSeconds * 1000) / 2
         } else {
@@ -82,7 +82,8 @@ object CooldownManager {
         "dire" to Cooldown(1111111, DIRE_HEAD, "Dire", "b")
     )
 
-    private val DIRE_REGEX = "PET: Dire Wolf \\[Dire Wolf Buff \\(\\dx Mobs Killed per Stack \\[(\\d+)s]\\)]".toRegex()
+    private val DIRE_REGEX =
+        "PET: Dire Wolf \\[Dire Wolf Buff \\(\\dx Mobs Killed per Stack \\[((\\d+m )?\\d+)s]\\)]".toRegex()
 
     var settings: CooldownSettings
 
@@ -255,8 +256,15 @@ object CooldownManager {
             }
 
             if (DIRE_REGEX.matches(event.msg)) {
-                DIRE_REGEX.find(event.msg)?.groups?.get(1)?.let {
-                    cooldowns["dire"]?.cooldownInSeconds = it.value.toInt()
+                DIRE_REGEX.find(event.msg)?.groups?.let { groups ->
+                    var seconds = 0
+                    groups[1]?.let {
+                        seconds += it.value.toInt() * 60
+                    }
+                    groups[2]?.let {
+                        seconds += it.value.toInt()
+                    }
+                    cooldowns["dire"]?.cooldownInSeconds = seconds
                     cooldowns["dire"]?.timeSinceLastUsed = System.currentTimeMillis()
                 }
             }
