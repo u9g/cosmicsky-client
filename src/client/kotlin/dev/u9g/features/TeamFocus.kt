@@ -48,6 +48,8 @@ object TeamFocus {
 //        }
 
         WorldRenderLastCallback.event.register {
+            if (!Settings.enableMod) return@register
+
             RenderInWorldContext.renderInWorld(it) {
                 MinecraftClient.getInstance().player?.let { me ->
                     MinecraftClient.getInstance().world?.players?.find { b ->

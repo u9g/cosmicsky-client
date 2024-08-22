@@ -8,6 +8,8 @@ import net.minecraft.util.Formatting
 object AddCosmicIdToLore {
     init {
         GetTooltipCallback.event.register { event ->
+            if (!Settings.enableMod) return@register
+
             if (event.context == TooltipContext.ADVANCED) {
                 event.stack.nbt?.let {
                     if (it.contains("c_iid")) {

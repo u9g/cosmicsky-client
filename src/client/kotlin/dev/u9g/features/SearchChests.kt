@@ -23,6 +23,8 @@ object SearchChests {
                     RestArgumentType
                 ) { searchArgument ->
                     thenExecute {
+                        if (!Settings.enableMod) return@thenExecute
+
                         searchParam = this[searchArgument]
                     }
                 }
@@ -30,6 +32,8 @@ object SearchChests {
         }
 
         BeforeDrawItemCallback.event.register {
+            if (!Settings.enableMod) return@register
+
             if (MinecraftClient.getInstance().currentScreen is GenericContainerScreen && it.stack.item != Items.AIR) {
                 if (searchParam != "clear" && it.stack.getTooltip(null, TooltipContext.BASIC)
                         .any { line -> line.string.contains(searchParam, ignoreCase = true) }

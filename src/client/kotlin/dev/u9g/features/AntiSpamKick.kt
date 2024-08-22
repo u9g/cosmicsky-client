@@ -11,6 +11,8 @@ object AntiSpamKick {
 
     init {
         UserSendMsgOrCmdCallback.event.register {
+            if (!Settings.enableMod) return@register
+
             if (it.type == MsgOrCmd.MSG || (it.type == MsgOrCmd.CMD && COMMANDS_THAT_TRIGGER_ANTISPAM.matches(it.msg))) {
                 if (System.currentTimeMillis() - lastMessageAt < 3000L) {
                     it.isCancelled = true

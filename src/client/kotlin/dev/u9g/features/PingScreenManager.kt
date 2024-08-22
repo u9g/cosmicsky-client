@@ -16,6 +16,8 @@ object PingScreenManager {
 
     init {
         ClientTickEvents.END_CLIENT_TICK.register {
+            if (!Settings.enableMod) return@register
+
             while (pingScreenKey.wasPressed()) {
                 mc.setScreen(PingScreen())
             }

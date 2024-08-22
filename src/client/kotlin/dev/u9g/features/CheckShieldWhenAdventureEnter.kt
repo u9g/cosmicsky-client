@@ -55,6 +55,8 @@ object CheckShieldWhenAdventureEnter {
         }
 
         BeforeDrawItemCallback.event.register {
+            if (!Settings.enableMod) return@register
+
             val stack = it.stack
             val instance = it.instance
             val x = it.x

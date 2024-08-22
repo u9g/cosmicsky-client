@@ -58,6 +58,8 @@ object ClueScrollManager {
 
     init {
         GetTooltipCallback.event.register {
+            if (!Settings.enableMod) return@register
+
             val csi = getClueScrollInfo(it.stack, it.tooltipLines)
             if (csi != null) {
                 val percentDone = min(csi.progress, 1.0)
@@ -80,6 +82,8 @@ object ClueScrollManager {
         }
 
         AfterDrawItemCallback.event.register {
+            if (!Settings.enableMod) return@register
+
             val instance = it.instance
             val stack = it.stack
             val x = it.x
