@@ -9,7 +9,7 @@ object NearFixer {
     private var lastNear = 0L
 
     private val nearRegex = "^(?:Nearby Players \\(\\d+\\): )?(.+)$".toRegex()
-    private val individualPlayerRegex = "(.+) \\((\\d)+m\\)".toRegex()
+    private val individualPlayerRegex = "(.+) \\((\\d+)m\\)".toRegex()
 
     init {
         ClientSendMessageEvents.COMMAND.register {
