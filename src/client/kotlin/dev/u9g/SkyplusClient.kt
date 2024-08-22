@@ -75,8 +75,8 @@ object SkyplusClient : ClientModInitializer {
         TeamFocus
         ExcellentSocks
         AntiSpamKick
-//        DownloadPosWhenRightClicking
-//        ChaoticZoneEnter
+        PotCounter
+        SearchChests
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
             CommandCallback.event.invoker().invoke(CommandEvent(dispatcher, ctx, mc.networkHandler?.commandDispatcher))
