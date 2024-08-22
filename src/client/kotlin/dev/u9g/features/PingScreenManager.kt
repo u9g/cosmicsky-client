@@ -7,6 +7,7 @@ import io.wispforest.owo.ui.container.Containers
 import io.wispforest.owo.ui.container.FlowLayout
 import io.wispforest.owo.ui.core.*
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.minecraft.client.option.KeyBinding
 import net.minecraft.client.util.InputUtil
 import net.minecraft.text.Text
@@ -15,6 +16,7 @@ object PingScreenManager {
     private val pingScreenKey = KeyBinding("Open Pings Screen", InputUtil.GLFW_KEY_RIGHT_BRACKET, "Pings")
 
     init {
+        KeyBindingHelper.registerKeyBinding(pingScreenKey)
         ClientTickEvents.END_CLIENT_TICK.register {
             if (!Settings.enableMod) return@register
 

@@ -83,6 +83,18 @@ object Websocket {
                         Settings.focusedPlayerUsername = parsed["username"].asString()
                     }
 
+                    "item_names" -> {
+                        val entries: MutableMap<Long, String> = mutableMapOf()
+                        for (element in parsed["itemNames"].asObject()) {
+                            try {
+                                entries[element.name.toLong()] = element.value.asString()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                        Settings.itemNames = entries
+                    }
+
                     "notification" -> {
                         if (parsed["json"] != null) {
                             MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
