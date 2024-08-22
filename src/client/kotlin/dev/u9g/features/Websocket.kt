@@ -207,7 +207,7 @@ object Websocket {
                             "type" to "connected",
                             "username" to MinecraftClient.getInstance().session.username,
                             "uuid" to it.toString(),
-                            "version" to "1.3.1",
+                            "version" to "1.3.2",
                             "reason" to nextReason
                         )
                     )
