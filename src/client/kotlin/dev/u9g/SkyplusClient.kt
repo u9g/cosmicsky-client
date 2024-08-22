@@ -77,6 +77,7 @@ object SkyplusClient : ClientModInitializer {
         AntiSpamKick
         PotCounter
         SearchChests
+        PingScreenManager
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
             CommandCallback.event.invoker().invoke(CommandEvent(dispatcher, ctx, mc.networkHandler?.commandDispatcher))
