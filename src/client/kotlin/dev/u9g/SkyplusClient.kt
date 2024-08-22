@@ -78,6 +78,7 @@ object SkyplusClient : ClientModInitializer {
         PotCounter
         SearchChests
         PingScreenManager
+        AddCosmicIdToLore
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
             CommandCallback.event.invoker().invoke(CommandEvent(dispatcher, ctx, mc.networkHandler?.commandDispatcher))

@@ -1,6 +1,7 @@
 package dev.u9g.events
 
 import net.fabricmc.fabric.api.event.EventFactory
+import net.minecraft.client.item.TooltipContext
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
 
@@ -21,5 +22,6 @@ fun interface GetTooltipCallback {
 
 data class GetTooltipEvent(
     val tooltipLines: MutableList<Text>,
-    val stack: ItemStack
+    val stack: ItemStack,
+    val context: TooltipContext
 )

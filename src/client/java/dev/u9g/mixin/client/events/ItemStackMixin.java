@@ -20,6 +20,6 @@ public class ItemStackMixin {
     private void skyplus$getTooltip(@Nullable PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> cir) {
         ItemStack item = (ItemStack) (Object) this;
 
-        GetTooltipCallback.getEvent().invoker().invoke(new GetTooltipEvent(cir.getReturnValue(), item));
+        GetTooltipCallback.getEvent().invoker().invoke(new GetTooltipEvent(cir.getReturnValue(), item, context));
     }
 }
