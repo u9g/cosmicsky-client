@@ -1,6 +1,5 @@
 package dev.u9g.features
 
-import dev.u9g.events.DecorateNameAboveHeadCallback
 import dev.u9g.events.WorldRenderLastCallback
 import dev.u9g.util.render.RenderInWorldContext
 import net.minecraft.client.MinecraftClient
@@ -8,10 +7,6 @@ import net.minecraft.entity.EntityPose
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.nbt.StringNbtReader
-import net.minecraft.text.MutableText
-import net.minecraft.text.Style
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 
 object TeamFocus {
@@ -21,36 +16,36 @@ object TeamFocus {
     }
 
     init {
-        DecorateNameAboveHeadCallback.event.register {
-            if (it.username.lowercase() == Settings.focusedPlayerUsername.lowercase()) {
-                MinecraftClient.getInstance().world?.players?.find { x -> x.gameProfile.name.lowercase() == Settings.focusedPlayerUsername.lowercase() }
-                    ?.let { player ->
-                        MinecraftClient.getInstance().player?.let { _ ->
-                            if (player.pose != EntityPose.CROUCHING) {
-                                val root = Text.of("")
-                                root.siblings.addAll(
-                                    Text.of("GGGGGGGG ")
-                                        .getWithStyle(
-                                            Style.EMPTY.withObfuscated(true).withColor(Formatting.RED).withBold(true)
-                                        )
-                                )
-//                                root.siblings.addAll(it.textToSend.getWithStyle(Style.EMPTY.withBold(true)))
-                                root.siblings.addAll(
-                                    Text.of(it.username)
-                                        .getWithStyle(Style.EMPTY.withColor(Formatting.RED).withBold(true))
-                                )
-                                root.siblings.addAll(
-                                    Text.of(" GGGGGGGG")
-                                        .getWithStyle(
-                                            Style.EMPTY.withObfuscated(true).withColor(Formatting.RED).withBold(true)
-                                        )
-                                )
-                                it.textToSend = root as MutableText
-                            }
-                        }
-                    }
-            }
-        }
+//        DecorateNameAboveHeadCallback.event.register {
+//            if (it.username.lowercase() == Settings.focusedPlayerUsername.lowercase()) {
+//                MinecraftClient.getInstance().world?.players?.find { x -> x.gameProfile.name.lowercase() == Settings.focusedPlayerUsername.lowercase() }
+//                    ?.let { player ->
+//                        MinecraftClient.getInstance().player?.let { _ ->
+//                            if (player.pose != EntityPose.CROUCHING) {
+//                                val root = Text.of("")
+//                                root.siblings.addAll(
+//                                    Text.of("GGGGGGGG ")
+//                                        .getWithStyle(
+//                                            Style.EMPTY.withObfuscated(true).withColor(Formatting.RED).withBold(true)
+//                                        )
+//                                )
+////                                root.siblings.addAll(it.textToSend.getWithStyle(Style.EMPTY.withBold(true)))
+//                                root.siblings.addAll(
+//                                    Text.of(it.username)
+//                                        .getWithStyle(Style.EMPTY.withColor(Formatting.RED).withBold(true))
+//                                )
+//                                root.siblings.addAll(
+//                                    Text.of(" GGGGGGGG")
+//                                        .getWithStyle(
+//                                            Style.EMPTY.withObfuscated(true).withColor(Formatting.RED).withBold(true)
+//                                        )
+//                                )
+//                                it.textToSend = root as MutableText
+//                            }
+//                        }
+//                    }
+//            }
+//        }
 
         WorldRenderLastCallback.event.register {
             RenderInWorldContext.renderInWorld(it) {
