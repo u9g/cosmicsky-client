@@ -83,7 +83,7 @@ object CooldownManager {
     )
 
     private val DIRE_REGEX =
-        "PET: Dire Wolf \\[Dire Wolf Buff \\(\\dx Mobs Killed per Stack \\[((\\d+m )?\\d+)s]\\)]".toRegex()
+        "PET: Dire Wolf \\[Dire Wolf Buff \\(\\dx Mobs Killed per Stack \\[(?:(\\d+)m )?(?:(\\d+)s)?]\\)]".toRegex()
 
     var settings: CooldownSettings
 
