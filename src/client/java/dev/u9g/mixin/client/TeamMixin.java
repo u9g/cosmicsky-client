@@ -21,6 +21,13 @@ public class TeamMixin {
                 String s = t.getPlayerList().iterator().next();
                 DecorateNameAboveHeadEvent dnahe = new DecorateNameAboveHeadEvent(s, cir.getReturnValue());
                 DecorateNameAboveHeadCallback.getEvent().invoker().invoke(dnahe);
+
+                if (dnahe.getTextToSend().getString().trim().isEmpty()) {
+                    System.out.println("Unexpected: username=" + dnahe.getUsername() + " became an empty string");
+                    dnahe.setTextToSend(cir.getReturnValue());
+                }
+
+
                 if (Settings.INSTANCE.getTeamMembers().contains(s)) {
                     cir.setReturnValue(dnahe.getTextToSend());
                 }
