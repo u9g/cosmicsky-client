@@ -42,14 +42,14 @@ object SkyplusClient : ClientModInitializer {
                         MinecraftClient.getInstance().player?.sendMessage(Text.of("Tried restarting when isRestarting=true, forcing isRestarting to false"))
                     }
                     Websocket.isRestarting = false
-                    Websocket.reset()
+                    Websocket.reset("/skyplusre")
                 }
             }
         }
 
         ServerConnectCallback.event.register {
             println("[gg] websocket started/init'd on server connect")
-            Websocket.reset()
+            Websocket.reset("server connect callback")
             println("[gg] Session")
             printSession("ServerConnectCallback")
         }
@@ -73,9 +73,14 @@ object SkyplusClient : ClientModInitializer {
         MakeChaoticGreenForTeamMembers
         CheckShieldWhenAdventureEnter
         TeamFocus
-        LogPv
-//        DownloadPosWhenRightClicking
-//        ChaoticZoneEnter
+        ExcellentSocks
+        AntiSpamKick
+        PotCounter
+        SearchChests
+        PingScreenManager
+        AddCosmicIdToLore
+        IsToolsPickaxeOnHotbar
+        MaxLevelPetOverlay
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, ctx ->
             CommandCallback.event.invoker().invoke(CommandEvent(dispatcher, ctx, mc.networkHandler?.commandDispatcher))

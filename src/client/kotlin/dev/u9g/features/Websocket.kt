@@ -83,6 +83,18 @@ object Websocket {
                         Settings.focusedPlayerUsername = parsed["username"].asString()
                     }
 
+                    "item_names" -> {
+                        val entries: MutableMap<Long, String> = mutableMapOf()
+                        for (element in parsed["itemNames"].asObject()) {
+                            try {
+                                entries[element.name.toLong()] = element.value.asString()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                        Settings.itemNames = entries
+                    }
+
                     "notification" -> {
                         if (parsed["json"] != null) {
                             MinecraftClient.getInstance().inGameHud.chatHud.addMessage(
@@ -207,9 +219,11 @@ object Websocket {
                             "type" to "connected",
                             "username" to MinecraftClient.getInstance().session.username,
                             "uuid" to it.toString(),
-                            "version" to "1.3.1"
+                            "version" to "1.3.3",
+                            "reason" to nextReason
                         )
                     )
+                    nextReason = ""
                 }
             }
 
@@ -231,7 +245,7 @@ object Websocket {
                     }
                     executor.submit {
                         println("[gg] ondisconnected reset")
-                        reset()
+                        reset("ondisconnect")
                     }
                 }
                 super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer)
@@ -239,6 +253,7 @@ object Websocket {
         })
 
     var isRestarting = false
+    var nextReason: String = "default"
     private val executor = Executors.newFixedThreadPool(2)
 
     init {
@@ -248,9 +263,10 @@ object Websocket {
         }
     }
 
-    fun reset() {
+    fun reset(reason: String) {
         if (!isRestarting) {
             isRestarting = true
+            nextReason = reason
             executor.submit {
                 websocket.sendClose()
                 websocket = websocket.recreate().connect()
@@ -265,7 +281,7 @@ object Websocket {
                 lastTimeSendingMessage = System.currentTimeMillis()
             }
             println("[gg] sendtext reset")
-            reset()
+            reset("sendText")
         }
         websocket.sendText(text)
     }

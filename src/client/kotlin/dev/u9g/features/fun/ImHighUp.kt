@@ -6,8 +6,9 @@ import dev.u9g.events.CommandCallback
 import dev.u9g.features.Settings
 import dev.u9g.mc
 import net.minecraft.client.MinecraftClient
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.DecimalFormat
-import kotlin.math.ceil
 
 
 object ImHighUp {
@@ -32,26 +33,26 @@ object ImHighUp {
                 if (matched != null) {
                     val (balanceWithCommas) = matched.destructured
 
-                    val balanceAsNumber = balanceWithCommas.replace(",", "")
-                        .toDoubleOrNull()?.let { d ->
-                            ceil(d).toInt()
-                        }
+                    val balanceAsNumber = BigDecimal(balanceWithCommas.replace(",", ""))
+                        .setScale(0, RoundingMode.UP)
 
-                    if (balanceAsNumber != null) {
-                        val jpTickets = balanceAsNumber / 10_000
+                    val jpTickets = balanceAsNumber / 10_000.bi()
 
-                        val jpTicketsString = if (jpTickets > 0) {
-                            "enough for a cf or $jpTickets jackpot tickets"
-                        } else {
-                            "$${addCommas.format(10_000 - balanceAsNumber)} away from a cf"
-                        }
+                    val jpTicketsString = if (jpTickets > 0.bi()) {
+                        "enough for a cf or $jpTickets jackpot tickets"
+                    } else {
+                        "$${addCommas.format(10_000.bi() - balanceAsNumber)} away from a cf"
+                    }
 
-                        MinecraftClient.getInstance().submit {
-                            mc.player?.networkHandler?.sendChatMessage("ImHighUp's Balance: $$balanceAsNumber (${jpTicketsString})")
-                        }
+                    MinecraftClient.getInstance().submit {
+                        mc.player?.networkHandler?.sendChatMessage("ImHighUp's Balance: $$balanceAsNumber (${jpTicketsString})")
                     }
                 }
             }
         }
     }
+}
+
+fun Int.bi(): BigDecimal {
+    return BigDecimal(this.toString())
 }

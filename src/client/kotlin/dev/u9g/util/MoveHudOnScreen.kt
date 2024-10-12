@@ -21,11 +21,7 @@ class MoveHudOnScreen(
     override fun build(rootComponent: FlowLayout) {
         fun fixAlignment() {
             rootComponent.verticalAlignment(
-                if (CooldownManager.settings.middleYPercent > 50) {
-                    VerticalAlignment.TOP
-                } else {
-                    VerticalAlignment.BOTTOM
-                }
+                VerticalAlignment.BOTTOM
             )
         }
 

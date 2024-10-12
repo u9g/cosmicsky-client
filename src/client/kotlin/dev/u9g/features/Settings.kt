@@ -24,6 +24,7 @@ object Settings {
     var colorMaxEnchants: Boolean = true
     var focusedPlayerUsername: String = "gg"
     var enableMod: Boolean = false
+    var itemNames: Map<Long, String> = mapOf()//mapOf("677799146160352".toLong() to "§a§lPick 1")
 
     init {
         CommandCallback.event.register {

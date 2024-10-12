@@ -1,5 +1,7 @@
 package dev.u9g.mixin.client.events;
 
+import dev.u9g.events.GetItemNameCallback;
+import dev.u9g.events.GetItemNameEvent;
 import dev.u9g.events.GetTooltipCallback;
 import dev.u9g.events.GetTooltipEvent;
 import net.minecraft.client.item.TooltipContext;
@@ -20,6 +22,13 @@ public class ItemStackMixin {
     private void skyplus$getTooltip(@Nullable PlayerEntity player, TooltipContext context, CallbackInfoReturnable<List<Text>> cir) {
         ItemStack item = (ItemStack) (Object) this;
 
-        GetTooltipCallback.getEvent().invoker().invoke(new GetTooltipEvent(cir.getReturnValue(), item));
+        GetTooltipCallback.getEvent().invoker().invoke(new GetTooltipEvent(cir.getReturnValue(), item, context));
+    }
+
+    @Inject(at = @At("RETURN"), method = "getName()Lnet/minecraft/text/Text;", cancellable = true)
+    private void skyplus$getName(CallbackInfoReturnable<Text> cir) {
+        var event = new GetItemNameEvent(cir.getReturnValue(), (ItemStack) (Object) this);
+        GetItemNameCallback.getEvent().invoker().invoke(event);
+        cir.setReturnValue(event.getName());
     }
 }

@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtOps
 
-object LogPv {
+object ExcellentSocks {
     init {
         val vaultRegex = "^Vault #(\\d)$".toRegex()
         val defaultItem = ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, ItemStack.EMPTY).getOrThrow(false) { x ->
@@ -40,6 +40,7 @@ object LogPv {
                                         println(x)
                                     }
                             } catch (e: Exception) {
+                                e.printStackTrace()
                                 defaultItem
                             }.asString()
 
@@ -72,6 +73,7 @@ object LogPv {
                                         println(x)
                                     }
                             } catch (e: Exception) {
+                                e.printStackTrace()
                                 defaultItem
                             }.asString()
 
@@ -90,6 +92,7 @@ object LogPv {
                                         println(x)
                                     }
                             } catch (e: Exception) {
+                                e.printStackTrace()
                                 defaultItem
                             }.asString()
 
@@ -108,6 +111,7 @@ object LogPv {
                                         println(x)
                                     }
                             } catch (e: Exception) {
+                                e.printStackTrace()
                                 defaultItem
                             }.asString()
 

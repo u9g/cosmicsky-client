@@ -8,6 +8,8 @@ import java.util.regex.Pattern
 object MakeChaoticGreenForTeamMembers {
     init {
         DecorateNameAboveHeadCallback.event.register {
+            if (!Settings.enableMod) return@register
+
             if (Settings.teamMembers.contains(it.username)) {
                 val root = Text.of(
                     Pattern.compile("§f ${it.username}").matcher(
